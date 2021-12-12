@@ -1,8 +1,8 @@
 class UsersController < ApplicationController
     def index
-
         render plain: "success"
     end
+    
     def login
         @user=User.find_by(name:params[:name])
 
