@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
     def index
-        render plain: "success"
+        render plain:"success"
     end
 
     def login
@@ -8,18 +8,32 @@ class UsersController < ApplicationController
 
         if @user
             session[:user_id] = @user.id
-            render plain:"#{@user[:id]} #{@user[:name]}"
+            # render plain:"#{@user[:id]} #{@user[:name]}"
+            render json:{
+                :code=>0,
+                :user_id=>@user[:id],
+                :user_name=>@user[:name]
+            }
         else
-            render plain:"not found ,pls signup"
+            render json:{
+                :code=>1,
+                :msg=>"not found ,pls check user name or email"   
+            }
         end
     end
 
     def logout
         if session[:user_id]
             session.delete(:user_id)
-            render plain:"logout"
+            render json:{
+                :code=>0,
+                :msg=>"Logout"   
+            }
         else
-            render plain:"not found ,pls login"
+            render json:{
+                :code=>1,
+                :msg=>"user not found"   
+            }
         end
     end
 
@@ -31,7 +45,10 @@ class UsersController < ApplicationController
         name=params[:name]
 
         if @user
-            render plain:"Already exist" 
+            render json:{
+                :code=>1,
+                :msg=>"User already exist" 
+            }
         elsif email && name
 
             @user=User.new
@@ -39,12 +56,21 @@ class UsersController < ApplicationController
             @user.email=params[:email]
 
             if @user.save
-                render plain:"Success" 
+                render json:{
+                    :code=>0,
+                    :msg=>"success" 
+                }
             else
-                render plain:"Fail" 
+                render json:{
+                    :code=>1,
+                    :msg=>"Fail,pls try again" 
+                }
             end
         else
-            render plain:"Params error" 
+            render json:{
+                :code=>1,
+                :msg=>"Params error"
+            }
         end
 
     end

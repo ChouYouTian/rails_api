@@ -19,7 +19,8 @@ class ProductController < ApplicationController
     end
 
     def getProducts
-        provider=User.find_by(name: params[:name])
+        # provider=User.find_by(id: params[:id])
+        products=Product.where(user_id: params[:id])
         # len=providers.products.length()
 
         # json="{\"products\":["
@@ -35,13 +36,16 @@ class ProductController < ApplicationController
 
         # render json:JSON.parse(json)
 
-        render json:provider.products
+        # render json:provider.products
+        render json:{
+            :code=>0,
+            :products=>products
+        }
         
     end
 
     #-----addProducts input example----
     # {
-    #     "name":"test", #user name
     #     "products":[
     #         {
     #             "name":"testproduct", #product name
@@ -55,9 +59,9 @@ class ProductController < ApplicationController
     # }
     def addProducts
 
-
         products=params[:products]
         msg=""
+        code=0
 
         if @user && products
             newProducts=[]
@@ -66,6 +70,7 @@ class ProductController < ApplicationController
             products.each do |p|
                 if myproductnames.include? p[:name]  #check is product exist
                     msg.concat " #{p[:name]} product allready exsit,"
+                    code=2
                     next
                 end
 
@@ -78,7 +83,7 @@ class ProductController < ApplicationController
                     np[:price]=price
                 end
                 if quentity
-                    np[:quentity]
+                    np[:quentity]=quentity
                 end
 
                 newProducts<<np
@@ -87,12 +92,25 @@ class ProductController < ApplicationController
 
             @user.products<<newProducts
 
-            render json:JSON.parse("{\"msg\":\"add products #{msg}\"}")
+            
+            if code==0
+                render json:{
+                    :code=>code,
+                    :msg=>"products created"
+                }
+            else
+                render json:{
+                    :code=>code,
+                    :msg=>"#{msg}"
+                }
+            end
 
-        elsif @user
-            render json:JSON.parse("{\"msg\":\"Did not find products,pls check your params\"}")
+       
         else
-            render json:JSON.parse("{\"msg\":\"user not exsit\"}")
+            render json:{
+                :code=>1,
+                :msg=>"fail,pls check your params,"
+            }
         end
     end
 
@@ -100,67 +118,77 @@ class ProductController < ApplicationController
     #-----updateProducts input example----
     # {
     #     "name":"test", #user name
-    #     "products":{
-    #                  "productname":{
-    #                                   --"name":"new productname", #new product name
-    #                                   --"price":20,          #new product price 
-    #                                   --"quentity":20        #new product quentity 
-    #                                 },
+    #     "products":[
+    #                  {
+    #                    "id":1 #product id
+    #                    --"name":"new productname", #new product name
+    #                    --"price":20,          #new product price 
+    #                    --"quentity":20        #new product quentity 
+    #                   },
     #         {
     #           ...
     #         }
-    #     }
+    #     ]
     # }
     def updateProducts
 
         products=params[:products]
         msg=""
+        code=0
 
-        if @user && products
-            
-            userProductsName=@user.products.map {|p| p[:name]}
-            
-            products.keys.each do |k| #check is product in users products ,if not then delete from products(hash)
-                if !userProductsName.include? k
-                    msg.concat " #{k} product not exsit"
-                    products.delete(k)
-                end
+        if products
+
+            pids=[]
+            hashPorducts={}
+
+            products.each do |p|
+                pids<<p[:id]
+                hashPorducts[p[:id].to_i]=p #tern products from array to hash by id
+
             end
-  
-            attName= Product.attribute_names()
-            
-            @user.products.each do |p|
-                setting=products[p[:name]]  #get produt setting by users product name 
-                                            #  if not in products(hash) return null
-                if setting
-                    setting.each do |k,v|
-                        if !attName.include? k  # check setting's attribute
-                            msg.concat " #{p[:name]} has no attribute #{k},"
-                            break
+   
 
-                        elsif k=="name"
-                            unless userProductsName.include? v  #check is product name been used 
-                                p[:name]=v
-                            else
-                                msg.concat " #{p[:name]} can't chage to #{v},"
-                                break
-                            end
-                        else
-                            p[k]=v
-                        end
+            myproducts=Product.where(id: pids,user_id: @user[:id])
+
+            myProductsName=@user.products.map {|p| p[:name]}
+
+            myproducts.each do |p|
+                id=p[:id]
+
+                if hashPorducts[id][:name] && hashPorducts[id][:name]!=p[:name]  #check is name been taken
+                    if myProductsName.include? hashPorducts[id][:name]
+                        msg.concat " #{p[:name]} can't chage to #{hashPorducts[id][:name]},"
+                        code=2
+                    else
+                        p[:name]=hashPorducts[id][:name]
                     end
-    
-                    p.save
-                    
                 end
+                if hashPorducts[id][:price] 
+                    p[:price]=hashPorducts[id][:price]
+                end
+                if hashPorducts[id][:quentity]
+                    p[:quentity]=hashPorducts[id][:quentity]
+                end
+                p.save
+                    
             end
-
-            render json:JSON.parse("{\"msg\":\"update products #{msg}\"}")
-
-        elsif @user
-            render json:JSON.parse("{\"msg\":\"Did not find products,pls check your params\"}")
+            
+            if code==0
+                render json:{
+                    :code=>code,
+                    :msg=>"update products"
+                }
+            else
+                render json:{
+                    :code=>code,
+                    :msg=>"#{msg}"
+                }
+            end
         else
-            render json:JSON.parse("{\"msg\":\"user not exsit\"}")
+            render json:{
+                :code=>1,
+                :msg=>"Params error"
+            }
         end
     end
     

@@ -3,8 +3,6 @@ class CartController < ApplicationController
 
 
     def myCart
-
-        # @user=User.find_by(name: params[:name])
         carts=@user.carts
         productlist=carts.map {|c| c[:product_id]}
 
@@ -47,7 +45,7 @@ class CartController < ApplicationController
         end
 
 
-        render json:carts
+        render json:{:carts=>carts ,:msg=>""}
     end
 
 

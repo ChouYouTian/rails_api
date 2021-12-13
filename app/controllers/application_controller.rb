@@ -6,6 +6,4 @@ class ApplicationController < ActionController::API
         @user = User.find_by(id: user_id)
         render plain:"pls login" if @user.nil?
     end
-
-
 end
