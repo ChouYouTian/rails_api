@@ -2,11 +2,12 @@ class UsersController < ApplicationController
     def index
         render plain: "success"
     end
-    
+
     def login
         @user=User.find_by(name:params[:name])
 
         if @user
+            session[:user_id] = @user.id
             render plain:"#{@user[:id]} #{@user[:name]}"
         else
             render plain:"not found ,pls signup"

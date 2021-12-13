@@ -1,7 +1,8 @@
 class TradeController < ApplicationController
+    before_action :autenticate_spa_user!
+
 
     def myTrade
-        @user=User.find_by(name: params[:name])
         render json:@user.trades
     end
 
@@ -13,7 +14,6 @@ class TradeController < ApplicationController
     # }
 
     def create
-        @user=User.find_by(name: params[:name])
         cartsId=params[:carts]
         
         if @user && cartsId

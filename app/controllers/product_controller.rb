@@ -1,4 +1,5 @@
 class ProductController < ApplicationController
+    before_action :autenticate_spa_user! ,only: [:addProducts,:updateProducts,:deleteProducts]
 
     def getProviders
         providers=User.all
@@ -18,7 +19,7 @@ class ProductController < ApplicationController
     end
 
     def getProducts
-        providers=User.find_by(name: params[:name])
+        provider=User.find_by(name: params[:name])
         # len=providers.products.length()
 
         # json="{\"products\":["
@@ -34,7 +35,7 @@ class ProductController < ApplicationController
 
         # render json:JSON.parse(json)
 
-        render json:providers.products
+        render json:provider.products
         
     end
 
@@ -53,7 +54,7 @@ class ProductController < ApplicationController
     #     ]
     # }
     def addProducts
-        @user=User.find_by(name: params[:name])
+
 
         products=params[:products]
         msg=""
@@ -68,7 +69,7 @@ class ProductController < ApplicationController
                     next
                 end
 
-                np=Product.new(name: p[:name])
+                np=Product.new(name: p[:name]) #new product
 
                 price=p[:price]
                 quentity=p[:quentity]
@@ -111,7 +112,6 @@ class ProductController < ApplicationController
     #     }
     # }
     def updateProducts
-        @user=User.find_by(name: params[:name])
 
         products=params[:products]
         msg=""

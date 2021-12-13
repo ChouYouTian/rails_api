@@ -1,13 +1,12 @@
 class CartController < ApplicationController
+    before_action :autenticate_spa_user!
+
 
     def myCart
-        @user=User.find_by(name: params[:name])
-        carts=@user.carts
 
-        productlist=[]   ##以後改
-        carts.each do |c|
-            productlist<<c[:product_id]
-        end
+        # @user=User.find_by(name: params[:name])
+        carts=@user.carts
+        productlist=carts.map {|c| c[:product_id]}
 
         products=Product.where(id: productlist)
         
@@ -24,22 +23,27 @@ class CartController < ApplicationController
                 if c[:product_user_id]!=tempP[:user_id] && c[:product_user_id]!=-1
                     c[:state]="disable"
                     c[:msg]="商品不存在"
+                    c.save
                 else
                     if c[:product_user_id]==-1
                         c[:product_user_id]=tempP[:user_id]
+                        c.save
                     end
+
                     if c[:amount]>tempP[:quentity]
                         c[:msg]="數量不足"
-                    else
+                        c.save
+                    elsif c[:msg]
                         c[:msg]=""
+                        c.save
                     end
                 end
             else
                 c[:state]="disable"
                 c[:msg]="商品不存在"
+                c.save
             end
 
-            c.save
         end
 
 
@@ -57,7 +61,7 @@ class CartController < ApplicationController
     #     
     # }
     def addToCart
-        @user=User.find_by(name: params[:name])
+ 
 
         @product=Product.find_by(id: params[:product][:id])
         
@@ -105,7 +109,6 @@ class CartController < ApplicationController
     #     
     # }
     def updateCarts
-        @user=User.find_by(name: params[:name])
         carts=params[:carts]
         msg=""
         if carts
@@ -138,7 +141,6 @@ class CartController < ApplicationController
     #     "carts":[10,...    ]         #cart id
     # }
     def deleteCarts
-        @user=User.find_by(name: params[:name])
         carts=params[:carts]
         msg=""
         if carts
