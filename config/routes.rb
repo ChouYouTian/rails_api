@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   get "/"=>"users#index"
 
   get "user"=>"users#index"
+  get "user"=>"users#logout"
   post "user/login"=>"users#login"
   post "user/signup"=>"users#signup"
 

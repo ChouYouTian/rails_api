@@ -12,8 +12,18 @@ class UsersController < ApplicationController
         else
             render plain:"not found ,pls signup"
         end
-
     end
+
+    def logout
+        if session[:user_id]
+            session.delete(:user_id)
+            render plain:"logout"
+        else
+            render plain:"not found ,pls login"
+        end
+    end
+
+
 
     def signup
         @user=User.find_by(email: params[:email])
