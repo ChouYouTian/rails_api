@@ -44,10 +44,10 @@
                     <h4>my product</h4>
                     <table id="myproducttable" class="table table-striped mt-3">
                         <thead>
-                            <tr>
+                            <tr><th></th>
                                 <th>Product name</th>
                                 <th>price</th>
-                                <th>amount</th>
+                                <th>quentity</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -73,21 +73,47 @@
                     </div>
                 </div>
 
+                <div class="mt-3 container">
+                    <h4>Products</h4>
+                    <select id="selectProviders" class="form-select w-25" onchange="selectProvider(this)">
+                        <option selected>Select provider</option>
+                    </select>
+                    
+                    <table id="producttable" class="table table-striped mt-3">
+                        <thead>
+                            <tr>
+                                <th>Product name</th>
+                                <th>price</th>
+                                <th>quentity</th>
+                                <th> </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+
+                </div>
+
 
             </div>
         </main>
-        <script>
+
+        <script>  //init
+            $(function() {
+                refresh()
+            });
+        </script>
+
+        <script> //util funtions
             function refresh(){
                 
                 if (sessionStorage.getItem("login")=="true"){
                     $("#login").css('display','none');
                     $("#mainpage").removeAttr('style');
                     $('#hello').text('Hello '+sessionStorage.getItem("user_name"))
-                    $('#myproducttable tbody tr').each(function(){
-                        $(this).remove()
-                    })
-                    // console.log($('#myproducttable tbody tr'))
-                    myproduct()
+                    myproducts();
+                    setProviders();
                 }
                 else{
                     // islogin="false";
@@ -97,63 +123,39 @@
                 }
             }
 
-
-        </script>
-
-
-        <script>
-            function myproduct(){
-                products=getProducts(sessionStorage.getItem('user_id'))
-
-                var table = document.getElementById("myproducttable").querySelector('tbody');
-                products.forEach(element => {
-                    var row = table.insertRow(-1);
-                    var cell1 = row.insertCell(0);
-                    var cell2 = row.insertCell(1);
-                    var cell3 = row.insertCell(2);
-                    var cell4 = row.insertCell(3);
-                    var cell5 = row.insertCell(4);
-                    cell1.innerHTML = '<input type="text" name="name" readonly value='+ element['name']+ '>';
-                    cell2.innerHTML = '<input type="number" name="price" min="0" max="500" readonly value='+element['price'] +'>';
-                    cell3.innerHTML = '<input type="number" name="quantity" min="0" max="500" readonly value='+element['quentity'] +'>';
-                    cell4.innerHTML = '<button name="save" onclick="saveProduct(this)">save</button>'+'<button name="edit" data-edit="false" onclick="editProduct(this)">edit</button>'
-                 
-                    $(cell5).hide();
-                    $(cell5).attr('name','id')
-                    $(cell5).attr('data-id',element['id'])
-                    
-                });
-
-            }
-            function getChild(element){
-                parent=element.parentNode.parentNode
-                pname=parent.querySelector('input[name="name"]') //pname product name
-                quentity= parent.querySelector('input[name="quantity"]')
-                price=parent.querySelector('input[name="price"]')
-                id=parent.querySelector('td[name="id"]')
-                return [pname,quentity,price,id]
-            }
-            function saveProduct(element){
-
-                [pname,quentity,price,id]=getChild(element) //pname product name
-
-                jdata={}
-                product={}
-                product["id"]=id.dataset.id
-                product["name"]=pname.value
-                product["quentity"]=quentity.value
-                product["price"]=price.value
-
-                jdata['products']=[product]
+            function postToApi(url,data,successfun,failfun){
                 $.ajax({    
-                    url: "/product/updateProducts",
-                    data: JSON.stringify(jdata),
+                    url: url,
+                    data: JSON.stringify(data),
                     type: "POST",
                     dataType: "json",
                     contentType: "application/json;charset=utf-8",
                     success: function(returnData){
                         if (returnData['code']==0){
-                            alert("Saved")
+                            successfun();
+                        }
+                        else{
+                            alert(returnData['msg']);
+                            failfun();
+                        }
+                    },
+                    error: function(xhr, ajaxOptions, thrownError){
+                        console.log(xhr.status);
+                        console.log(thrownError);
+                    }}
+                )
+            }
+        
+            function getFromApi(url){
+                var callback
+                $.ajax({ 
+                    async:false,
+                    url: url ,
+                    type: "GET",
+                    contentType: "application/json;charset=utf-8",
+                    success: function(returnData){
+                        if (returnData['code']==0){
+                            callback=returnData
                         }
                         else{
                             alert(returnData['msg']);
@@ -164,28 +166,10 @@
                         console.log(thrownError);
                     }}
                 )
-                
+                return callback
             }
-
-            function editProduct(element){
-                [pname,quentity,price,id]=getChild(element) //pname product name
-                if (element.dataset.edit=='false'){
-       
-                    pname.removeAttribute('readonly')
-                    quentity.removeAttribute('readonly')
-                    price.removeAttribute('readonly')
-                  
-                    element.setAttribute('data-edit','true')
-                }
-                else{
-                    pname.setAttribute('readonly',true)
-                    quentity.setAttribute('readonly',true)
-                    price.setAttribute('readonly',true)
-
-                    element.setAttribute('data-edit','false')
-                }
-            }
-
+        
+            
             function getProducts(id){
                 var products
                 $.ajax({ 
@@ -208,49 +192,196 @@
                 )
                 return products
             }
+        </script>
 
-            function createProduct(element){
-                parent=element.parentNode
-                pname=parent.querySelector('input[name="name"]').value //product name
-                price=parent.querySelector('input[name="price"]').value 
-                quentity=parent.querySelector('input[name="quentity"]').value
+
+        <script> //product funtions
+            function myproducts(){
+                products=getProducts(sessionStorage.getItem('user_id'))
+                $('#myproducttable tbody tr').each(function(){
+                        $(this).remove()
+                    })
+                var table = document.getElementById("myproducttable").querySelector('tbody');
+
+                products.forEach(element => {
+                    var row = table.insertRow(-1);
+                    var cell0 = row.insertCell(0);
+                    var cell1 = row.insertCell(1);
+                    var cell2 = row.insertCell(2);
+                    var cell3 = row.insertCell(3);
+                    var cell4 = row.insertCell(4);
+                    var cell5 = row.insertCell(5);
+
+                    cell1.innerHTML = '<input type="text" name="name" readonly value='+ element['name']+ '>';
+                    cell2.innerHTML = '<input type="number" name="price" min="0" max="500" readonly value='+element['price'] +'>';
+                    cell3.innerHTML = '<input type="number" name="quantity" min="0" max="500" readonly value='+element['quentity'] +'>';
+
+                    cell0.innerHTML = '<button name="delete" onclick="deleteProduct(this)">delete</button>'
+                    cell4.innerHTML = '<button name="save" onclick="saveProduct(this)">save</button>'+'<button name="edit"  onclick="editProduct(this)">edit</button>'
+                 
+                    $(cell5).hide();
+                    $(cell5).attr('name','id')
+                    $(cell5).attr('data-id',element['id'])
+                    $(cell5).attr('data-edit','false')
+                    
+                });
+
+            }
+            function getSibling(element){
+                parent=element.parentNode.parentNode
+                pname=parent.querySelector('input[name="name"]') //pname product name
+                quentity= parent.querySelector('input[name="quantity"]')
+                price=parent.querySelector('input[name="price"]')
+                id=parent.querySelector('td[name="id"]')
+                return [pname,quentity,price,id]
+            }
+
+            function saveProduct(element){
+
+                [pname,quentity,price,id]=getSibling(element) //pname product name
 
                 jdata={}
                 product={}
-                product["name"]=pname
-                product["quentity"]=quentity
-                product["price"]=price
+                product["id"]=id.dataset.id
+                product["name"]=pname.value
+                product["quentity"]=quentity.value
+                product["price"]=price.value
 
                 jdata['products']=[product]
-                $.ajax({    
-                    url: "/product/addProducts",
-                    data: JSON.stringify(jdata),
-                    type: "POST",
-                    dataType: "json",
-                    contentType: "application/json;charset=utf-8",
-                    success: function(returnData){
-                        if (returnData['code']==0){
-                            alert("Saved")
-                        }
-                        else{
-                            alert(returnData['msg']);
-                        }
-                    },
-                    error: function(xhr, ajaxOptions, thrownError){
-                        console.log(xhr.status);
-                        console.log(thrownError);
-                    }}
+                
+                postToApi( "/product/updateProducts",jdata,
+                ()=>{
+                    alert("Saved");
+                    editProduct(element);
+                },
+                ()=>{
+                    myproducts()
+                }
                 )
+            }
+
+            function editProduct(element){
+                [pname,quentity,price,id]=getSibling(element) //pname product name
+                if (id.dataset.edit=='false'){
+       
+                    pname.removeAttribute('readonly')
+                    quentity.removeAttribute('readonly')
+                    price.removeAttribute('readonly')
+                  
+                    id.setAttribute('data-edit','true')
+                }
+                else{
+                    pname.setAttribute('readonly',true)
+                    quentity.setAttribute('readonly',true)
+                    price.setAttribute('readonly',true)
+
+                    id.setAttribute('data-edit','false')
+                }
+            }
+
+
+            function createProduct(element){
+                parent=element.parentNode
+                pname=parent.querySelector('input[name="name"]') //product name
+                price=parent.querySelector('input[name="price"]')
+                quentity=parent.querySelector('input[name="quentity"]')
+
+                jdata={}
+                product={}
+                product["name"]=pname.value
+                product["quentity"]=quentity.value 
+                product["price"]=price.value
+
+                jdata['products']=[product]
+
+                postToApi("/product/addProducts",jdata,
+                ()=>{
+                    alert("Saved");
+                    myproducts();
+                    pname.value="";
+                    quentity.value =0;
+                    price.value=0;
+                })
 
                 
                 
             }
+        
+            function deleteProduct(element){
+
+                
+                [pname,quentity,price,id]=getSibling(element)
+
+                if (confirm("Sure to delete "+pname.value+"?")){
+                    jdata={"products":[id.dataset.id]}
+    
+                    parent=element.parentNode.parentNode;
+                    postToApi('/product/deleteProducts',jdata,
+                    ()=>{
+                        parent.remove();
+                    })
+                }
+
+            }
+        
+        </script>
+        
+        <script> //prvoder funtions
+            
+
+            
+            function setProviders(){
+                callback=getFromApi('/product/providers')
+                providers=callback["providers"]
+
+                select=document.getElementById("selectProviders");
+
+                providers.forEach(p=>{
+                    var option = document.createElement("option");
+                    option.text=p["name"]
+                    option.value=p["id"]
+                    select.add(option,-1)
+                })
+            }
+
+            
+            function selectProvider(element){
+                console.log(element.value)
+                products=getProducts(element.value)
+
+                
+                $('#producttable tbody tr').each(function(){
+                        $(this).remove()
+                })
+                var table = document.getElementById("producttable").querySelector('tbody');
+
+                products.forEach(element => {
+                    var row = table.insertRow(-1);
+       
+                    var cell0 = row.insertCell(0);
+                    var cell1 = row.insertCell(1);
+                    var cell2 = row.insertCell(2);
+                    var cell3 = row.insertCell(3);
+                    var cell4 = row.insertCell(4);
+
+                    cell0.innerHTML = element['name'];
+                    cell1.innerHTML = element['price'];
+                    cell2.innerHTML = element['quentity'];
+
+                    cell3.innerHTML = '<button name="addToCart" onclick="">add to cart</button>'
+                 
+                    $(cell4).hide();
+                    $(cell4).attr('name','id')
+                    $(cell4).attr('data-id',element['id'])
+                    $(cell4).attr('data-edit','false')
+                    
+                });
+
+            }
         </script>
         
         
-        <script>  
-            // sessionStorage.setItem("login","true");      ///  
-            refresh();
+        <script>  //user funtions
 
             function login(){
                 jdata={}
@@ -291,7 +422,7 @@
                     success: function(returnData){
                         // console.log(returnData);
                         if (returnData['code']==0){
-                            alert("Success");
+                            alert("Success,you can login now");
                         }
                         else{
                             alert(returnData['msg']);
@@ -308,7 +439,6 @@
                 $.ajax({    
                     url: "/user/logout",
                     type: "Get",
-
                     success: function(returnData){
                         // console.log(returnData);
                         if (returnData['code']==0){

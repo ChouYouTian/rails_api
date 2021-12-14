@@ -4,18 +4,28 @@ class ProductController < ApplicationController
     def getProviders
         providers=User.all
         len=providers.length()-1
-        json="{\"providers\":["
+        # json="["
+        plist=[]
 
         providers.each_with_index do |p,i|
-            json.concat "\"#{p.name}\""
-            if i!=len
-                json.concat ","
-            end
+            # json.concat "{\"name\" : #{p[:name]} \"id\": #{p[:id]} }"
+
+            
+            # if i!=len
+            #     json.concat ","
+            # end
+
+            plist<<{"name":p[:name],"id":p[:id]}
         end
 
-        json.concat "]}"
+        # json.concat "]"
 
-        render json:JSON.parse(json)
+        # render json:JSON.parse(json)
+
+        render json:{
+            :code=>0,
+            :providers=>plist
+        }
     end
 
     def getProducts
@@ -194,16 +204,15 @@ class ProductController < ApplicationController
     
     #-----deleteProducts input example----
     # {
-    #     "name":"test", #user name
-    #     "products":[1...] #product id
+    #     "products":[1...] #product id (int)
     # }
     def deleteProducts
-        @user=User.find_by(name: params[:name])
 
         products=params[:products]
         msg=""
+        code=0
 
-        if @user && products
+        if products
  
             products.each do |p|
                 myproduct=Product.find_by(id: p,user_id: @user[:id])
@@ -212,15 +221,26 @@ class ProductController < ApplicationController
                     msg.concat "delete #{myproduct[:id]}, "
                 else
                     msg.concat "can't find #{p} in #{@user[:name]}'s cart,"
+                    code=2
                 end
             end
 
-            render json:JSON.parse("{\"msg\":\"delete products #{msg}\"}")
-
-        elsif @user
-            render json:JSON.parse("{\"msg\":\"Did not find products,pls check your params\"}")
+            if code==0
+                render json:{
+                    :code=>code,
+                    :msg=>"products deleted"
+                }
+            else
+                render json:{
+                    :code=>code,
+                    :msg=>"#{msg}"
+                }
+            end
         else
-            render json:JSON.parse("{\"msg\":\"user not exsit\"}")
+            render json:{
+                :code=>1,
+                :msg=>"Did not find products,pls check your params"
+            }
         end
     end
 
