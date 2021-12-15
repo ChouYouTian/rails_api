@@ -74,6 +74,28 @@
                 </div>
 
                 <div class="mt-3 container">
+                    <h4>My cart</h4>
+                    <table id="carttable" class="table table-striped mt-3">
+                        <thead>
+                            <tr>
+                                <th>Select</th>
+                                <th>Product name</th>
+                                <th>amount</th>
+                                <th>price</th>
+                                <th>quentity</th>
+                                <th>total price</th>
+                                <th> </th>
+                                <th>message</th>
+                                <th> </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-3 container">
                     <h4>Products</h4>
                     <select id="selectProviders" class="form-select w-25" onchange="selectProvider(this)">
                         <option selected>Select provider</option>
@@ -83,9 +105,11 @@
                         <thead>
                             <tr>
                                 <th>Product name</th>
-                                <th>price</th>
                                 <th>quentity</th>
+                                <th>price</th>
+                                <th>amount</th>
                                 <th> </th>
+                                <!-- <th></th> -->
                             </tr>
                         </thead>
                         <tbody>
@@ -114,6 +138,7 @@
                     $('#hello').text('Hello '+sessionStorage.getItem("user_name"))
                     myproducts();
                     setProviders();
+                    setCart();  
                 }
                 else{
                     // islogin="false";
@@ -123,7 +148,7 @@
                 }
             }
 
-            function postToApi(url,data,successfun,failfun){
+            function postToApi(url,data,successfun=()=>{},failfun=()=>{}){
                 $.ajax({    
                     url: url,
                     data: JSON.stringify(data),
@@ -213,7 +238,7 @@
                     var cell5 = row.insertCell(5);
 
                     cell1.innerHTML = '<input type="text" name="name" readonly value='+ element['name']+ '>';
-                    cell2.innerHTML = '<input type="number" name="price" min="0" max="500" readonly value='+element['price'] +'>';
+                    cell2.innerHTML = '<input type="number" name="price" min="0" max="5000" readonly value='+element['price'] +'>';
                     cell3.innerHTML = '<input type="number" name="quantity" min="0" max="500" readonly value='+element['quentity'] +'>';
 
                     cell0.innerHTML = '<button name="delete" onclick="deleteProduct(this)">delete</button>'
@@ -325,16 +350,110 @@
             }
         
         </script>
+
+        <script> //cart funtions
+            function setCart(){
+                carts=getFromApi('/cart')["carts"]
+
+                var table = document.getElementById("carttable").querySelector('tbody');
+                
+                $("#carttable tbody tr").each(function(){
+                        $(this).remove()
+                })
+
+                carts.forEach(cart=>{
+                    var row = table.insertRow(-1);
+    
+                    var selectbtn = row.insertCell(0);
+                    var name = row.insertCell(1);
+                    var amount = row.insertCell(2);
+                    var price = row.insertCell(3);
+                    var quentity = row.insertCell(4);
+                    var total_price = row.insertCell(5);
+                    var deletebtn = row.insertCell(6);
+                    var msg = row.insertCell(7);
+                    var id = row.insertCell(8);
+
+                    name.innerHTML = cart['name'];
+                    amount.innerHTML ='<input type="number" name="amount" onchange="changeCartAmount(this)" min="0" max='+cart['quentity']+' value='+cart['amount'] +'>';;
+                    price.innerHTML = cart['price'];
+                    price.setAttribute('name','price')
+                    quentity.innerHTML = cart['quentity'];
+                    quentity.setAttribute('name','quentity')
+                    total_price.innerHTML=cart['total_price']
+                    total_price.setAttribute('name','total_price')
+                    deletebtn.innerHTML= '<button  onclick="deleteCart(this)">delete</button>'
+                    msg.innerHTML= cart['msg']
+
+                    selectbtn.innerHTML='<input type="checkbox" name="cbox">'
+                
+                    $(id).hide();
+                    $(id).attr('name','id')
+                    $(id).attr('data-id',cart['id'])
+                    
+                })
+            }
+
+            function deleteCart(element){
+                parent=element.parentNode.parentNode
+
+                id=parent.querySelector('td[name="id"]').dataset.id
+                jdata=[id]
+                postToApi('cart/deleteCarts',{"carts":jdata},()=>{alert(id+'deleted');parent.remove();});
+
+            }
+
+            function addToCart(element){
+                parent=element.parentNode.parentNode
+                id=parent.querySelector('td[name="id"]').dataset.id
+
+                amount=parent.querySelector('input[name="amount"]').value
+
+                if(amount==0){
+                    alert('Amount can\'t be 0')
+                }
+                else{
+                    postToApi('/cart/addToCart',{"product":{"id":id,"amount":amount}},
+                        ()=>{alert("added to cart");
+                             setCart()   
+                            })
+                }
+
+
+            }
+
+            function changeCartAmount(element){
+                
+                parent=element.parentNode.parentNode
+                id=parent.querySelector('td[name="id"')
+                price=parent.querySelector('td[name="price"]')
+                total_price=parent.querySelector('td[name="total_price"]')
+
+                total_price.innerHTML=parseInt(price.innerHTML)*element.value
+
+
+
+                postToApi('cart/updateCarts',{"carts":[{"id":id.dataset.id,"amount":element.value,"total_price":total_price.innerHTML}]})
+                
+            }
+        </script>
         
         <script> //prvoder funtions
             
 
             
-            function setProviders(){
+            function setProviders(){  
                 callback=getFromApi('/product/providers')
                 providers=callback["providers"]
 
                 select=document.getElementById("selectProviders");
+
+                if (select.length>1){
+                    len=select.length
+                    for(i=1;i<len;i++){
+                        select.remove(1)
+                    }
+                }
 
                 providers.forEach(p=>{
                     var option = document.createElement("option");
@@ -345,10 +464,8 @@
             }
 
             
-            function selectProvider(element){
-                console.log(element.value)
+            function selectProvider(element){  //select provider and get products
                 products=getProducts(element.value)
-
                 
                 $('#producttable tbody tr').each(function(){
                         $(this).remove()
@@ -358,22 +475,24 @@
                 products.forEach(element => {
                     var row = table.insertRow(-1);
        
-                    var cell0 = row.insertCell(0);
-                    var cell1 = row.insertCell(1);
-                    var cell2 = row.insertCell(2);
-                    var cell3 = row.insertCell(3);
-                    var cell4 = row.insertCell(4);
+                    var name = row.insertCell(0);
+                    var quentity = row.insertCell(1);
+                    var price = row.insertCell(2);
+                    var amount = row.insertCell(3);
+                    var addbtn = row.insertCell(4);
+                    var id = row.insertCell(5);
 
-                    cell0.innerHTML = element['name'];
-                    cell1.innerHTML = element['price'];
-                    cell2.innerHTML = element['quentity'];
+                    name.innerHTML = element['name'];
+                    quentity.innerHTML = element['quentity'];
+                    price.innerHTML = element['price'];
+                    amount.innerHTML='<input type="number" name="amount" min="0" max='+element['quentity']+' value=0>';
 
-                    cell3.innerHTML = '<button name="addToCart" onclick="">add to cart</button>'
+                    addbtn.innerHTML = '<button name="addToCart" onclick="addToCart(this)">add to cart</button>'
                  
-                    $(cell4).hide();
-                    $(cell4).attr('name','id')
-                    $(cell4).attr('data-id',element['id'])
-                    $(cell4).attr('data-edit','false')
+                    $(id).hide();
+                    $(id).attr('name','id')
+                    $(id).attr('data-id',element['id'])
+                    $(id).attr('data-edit','false')
                     
                 });
 
