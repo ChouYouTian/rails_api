@@ -5,8 +5,10 @@ Rails.application.routes.draw do
 
   get "user"=>"users#index"
   get "user/logout"=>"users#logout"
+  get "user/delete"=>"users#delete"
   post "user/login"=>"users#login"
   post "user/signup"=>"users#signup"
+
 
 
   get "product/providers"=>"product#getProviders"

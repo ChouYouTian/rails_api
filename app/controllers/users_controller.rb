@@ -1,4 +1,6 @@
 class UsersController < ApplicationController
+    before_action :autenticate_spa_user! ,only: [:delete]
+    
     def index
         render plain:"success"
     end
@@ -70,6 +72,31 @@ class UsersController < ApplicationController
             render json:{
                 :code=>1,
                 :msg=>"Params error"
+            }
+        end
+
+    end
+
+    def delete
+        
+        begin 
+            @user.transaction do
+                
+                @user.carts.each {|c| c.destroy!}
+                @user.products.each {|p| p.destroy!}
+                @user.trades.each {|t| t.destroy!}
+
+                @user.destroy!
+
+            end
+            render json:{
+                :code=>0,
+                :msg=>"Success"
+            }
+        rescue 
+            render json:{
+                :code=>1,
+                :msg=>"fail"
             }
         end
 

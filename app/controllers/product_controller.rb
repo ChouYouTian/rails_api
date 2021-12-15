@@ -89,10 +89,11 @@ class ProductController < ApplicationController
                 price=p[:price]
                 quentity=p[:quentity]
 
-                if price
+                if price!=""
+     
                     np[:price]=price
                 end
-                if quentity
+                if quentity!=""
                     np[:quentity]=quentity
                 end
 

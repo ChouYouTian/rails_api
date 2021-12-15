@@ -11,13 +11,8 @@ class CartController < ApplicationController
     end
 
     def myCart
-        # carts=@user.carts
-
-
-        # cs=Cart.includes(:products).where(:user_id @user.id)
         carts=Cart.eager_load(:product).where(user_id: @user.id)
 
-        
         if carts 
 
             output=[]
@@ -25,22 +20,18 @@ class CartController < ApplicationController
             carts.each do |cart|
     
                 save=false
+                cartinfo={}
                 product=cart.product
 
-                cartinfo={}
-
-                if product &&( cart[:product_user_id]==product[:user_id] or cart[:product_user_id]==-1)
-
-                    if cart[:product_user_id]==-1
-                        cart[:product_user_id]=product[:user_id]
-                        save=true
-                    end
+                if product &&(cart[:product_user_id]==product[:user_id])
 
                     if cart[:amount]>product[:quentity]
                         cart[:msg]="數量不足"
+                        cart[:state]="lack"
                         save=true
                     elsif cart[:msg]!=""
                         cart[:msg]=""
+                        cart[:state]="active"
                         save=true
                     end
 
@@ -53,13 +44,13 @@ class CartController < ApplicationController
                     cartinfo={:id=>cart[:id],:amount=>cart[:amount],:total_price=>cart[:total_price],:state=>cart[:state],:msg=>cart[:msg],:name=>product[:name],:price=>product[:price],:quentity=>product[:quentity]}
 
                 else
-                    if cart[:state]=="active"
+                    if cart[:state]!="disable"
                         cart[:state]="disable"
                         cart[:msg]="商品不存在"
                         save=true
                     end
-                    cartinfo={:id=>cart[:id],:amount=>cart[:amount],:total_price=>cart[:total_price],:state=>cart[:state],:msg=>cart[:msg],:name=>nil,:price=>nil,:quentity=>nil}
 
+                    cartinfo={:id=>cart[:id],:amount=>cart[:amount],:total_price=>cart[:total_price],:state=>cart[:state],:msg=>cart[:msg],:name=>nil,:price=>nil,:quentity=>nil}
                 end
                 
                 if save
@@ -68,8 +59,8 @@ class CartController < ApplicationController
 
                 output<<cartinfo
             end
+
             render json:{:code=>0, :carts=>output ,:msg=>""}
-            
         else            
             render json:{:code=>0, :carts=>[] ,:msg=>"cart is empty"}
         end
