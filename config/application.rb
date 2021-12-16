@@ -38,5 +38,6 @@ module ShoppingApi
     config.api_only = true
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use ActionDispatch::Session::CookieStore
+    # config.ecpay = Rails.application.config_for(:ecpay)
   end
 end

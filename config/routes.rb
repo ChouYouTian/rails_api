@@ -25,6 +25,10 @@ Rails.application.routes.draw do
   get "trade"=>"trade#myTrade"
   post "trade/create"=>"trade#create"
   post "trade/update"=>"trade#update"
+  post "trade/pay"=>"trade#payByECPay"
+  post "trade/payed"=>"trade#payed"
+  post 
+  get "trade/test"=>"trade#test"
 
   get "cart/test"=>"cart#testCart"
   

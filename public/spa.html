@@ -34,7 +34,7 @@
                 <div class="col-sm-3"></div>
             </div>
 
-            <div id="mainpage" class="container mt-3">
+            <div id="mainpage" class="container mt-3" style="display: none;">
                 <div class="row">
                     <h1 class="col-sm-6" id="hello">Hello,user</h1>
                     <button class="col-sm-3 btn btn-lg btn-danger" onclick="deleteUser()">Delete User</button>
@@ -644,6 +644,31 @@
 
 
             }
+        
+            function payTrade(){
+
+                // html=postToApi('trade/pay',{})
+                html=""
+
+                $.ajax({ 
+                    async:false,
+                    url: "trade/pay" ,
+                    type: "GET",
+                    contentType: "application/json;charset=utf-8",
+                    success: function(returnData){
+                        html=returnData
+                    },
+                    error: function(xhr, ajaxOptions, thrownError){
+                        console.log(xhr.status);
+                        console.log(thrownError);
+                    }}
+                )
+
+
+                w=window.open();
+                $(w.document.body).html(html);
+            }
+        
         </script>
         
         <script>  //user funtions

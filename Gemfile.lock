@@ -66,6 +66,7 @@ GEM
     byebug (11.1.3)
     concurrent-ruby (1.1.9)
     crass (1.0.6)
+    ecpay_payment (1.1.1)
     erubi (1.10.0)
     globalid (1.0.0)
       activesupport (>= 5.0)
@@ -142,6 +143,7 @@ PLATFORMS
 DEPENDENCIES
   bootsnap (>= 1.4.4)
   byebug
+  ecpay_payment
   pg
   puma (~> 5.0)
   rails (~> 6.1.4, >= 6.1.4.1)
