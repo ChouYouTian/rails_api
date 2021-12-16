@@ -41,7 +41,8 @@
 
                     <button id="btnlogout" class="col-sm-3 btn btn-lg btn-primary" onclick="logout()">Logout</button>
                 </div>
-             
+                
+                <!-- myproduct -->
                 <div class="mt-3">
                     <h4>my product</h4>
                     <table id="myproducttable" class="table table-striped mt-3">
@@ -57,7 +58,8 @@
                         </tbody>
                     </table>
                 </div>
-
+                
+                <!-- create product -->
                 <div class="mt-3">
                     <h4>Create product</h4>
                     <div class="input-group">
@@ -74,35 +76,8 @@
                         <button class="btn btn-info" onclick="createProduct(this)">create</button>
                     </div>
                 </div>
-
-                <div class="mt-3 container">
-                    <h4>My cart</h4>
-                    <table id="carttable" class="table table-striped mt-3">
-                        <thead>
-                            <tr>
-                                <th>Select</th>
-                                <th>Product name</th>
-                                <th>amount</th>
-                                <th>price</th>
-                                <th>quentity</th>
-                                <th>total price</th>
-                                <th> </th>
-                                <th>message</th>
-                                <th> </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-
-                        </tbody>
-                        <tfoot style="text-align:center">
-                            <tr>
-                              <td>Sum</td>
-                              <td id="total">$0</td>
-                            </tr>
-                        </tfoot> 
-                    </table>
-                </div>
-
+                
+                <!-- products -->
                 <div class="mt-3 container">
                     <h4>Products</h4>
                     <select id="selectProviders" class="form-select w-25" onchange="selectProvider(this)">
@@ -121,13 +96,70 @@
                             </tr>
                         </thead>
                         <tbody>
-
+                            
                         </tbody>
                     </table>
-
+                    
                 </div>
 
 
+                <!-- cart -->
+                <div class="mt-3 container"> 
+                    <h4>My cart</h4>
+                    <table id="carttable" class="table table-striped mt-3" style="text-align:center">
+                        <thead>
+                            <tr>
+                                <th>Select</th>
+                                <th>Product name</th>
+                                <th>amount</th>
+                                <th>price</th>
+                                <th>quentity</th>
+                                <th>total price</th>
+                                <th> </th>
+                                <th>message</th>
+                                <th>state</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody >
+
+                        </tbody>
+                        <tfoot style="text-align:center">
+                            <tr>
+                              <td>Sum</td>
+                              <td id="total">$0</td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td></td>
+                              <td><button onclick="createTrade()">結帳</button></td>
+                            </tr>
+                        </tfoot> 
+                    </table>
+                </div>
+            
+                <!-- mytrade -->
+                <div class="mt-3 container">
+                    <h4>My trade</h4>
+                    <table id="tradetable" class="table table-striped mt-3" style="text-align:center">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Trade id</th>
+                                <th>detail</th>
+                                <th>total price</th>
+                                <th>state</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody >
+
+                        </tbody>
+
+                    </table>
+                </div>
+            
+            
             </div>
         </main>
 
@@ -146,7 +178,8 @@
                     $('#hello').text('Hello '+sessionStorage.getItem("user_name"))
                     myproducts();
                     setProviders();
-                    setCart();  
+                    setCart();
+                    setTrade();
                 }
                 else{
                     // islogin="false";
@@ -157,7 +190,9 @@
             }
 
             function postToApi(url,data,successfun=()=>{},failfun=()=>{}){
+                callback=false
                 $.ajax({    
+                    async:false,
                     url: url,
                     data: JSON.stringify(data),
                     type: "POST",
@@ -166,6 +201,7 @@
                     success: function(returnData){
                         if (returnData['code']==0){
                             successfun();
+                            callback=true
                         }
                         else{
                             alert(returnData['msg']);
@@ -177,6 +213,7 @@
                         console.log(thrownError);
                     }}
                 )
+                return callback
             }
         
             function getFromApi(url){
@@ -380,7 +417,8 @@
                     var total_price = row.insertCell(5);
                     var deletebtn = row.insertCell(6);
                     var msg = row.insertCell(7);
-                    var id = row.insertCell(8);
+                    var state = row.insertCell(8);
+                    var id = row.insertCell(9);
 
                     name.innerHTML = cart['name'];
                     amount.innerHTML ='<input type="number" name="amount" onchange="changeCartAmount(this)" min="1"'+' value='+cart['amount'] + '>';;
@@ -393,9 +431,15 @@
                     deletebtn.innerHTML= '<button  onclick="deleteCart(this)">delete</button>'
                     msg.innerHTML= cart['msg']
                     msg.setAttribute('name','msg')
+                    state.innerHTML=cart['state']
                     
-                    if(cart['state']!="active"){
+                    if(cart['state']=="lack"){
                         selectbtn.innerHTML='<input name="select" type="checkbox" onclick="setCartTotalPrice()" disabled>'
+                    }
+                    else if(cart['state']=="disable" || cart['state']=="intrade" ){
+                        selectbtn.innerHTML='<input name="select" type="checkbox" disabled>'
+                        amount.innerHTML=cart["amount"]
+                        deletebtn.querySelector("button").setAttribute("disabled",1)
                     }
                     else{
                         selectbtn.innerHTML='<input name="select" type="checkbox" onclick="setCartTotalPrice()">'
@@ -456,23 +500,21 @@
                     
                 }
 
-
                 total_price.innerHTML=parseInt(price.innerHTML)*element.value
 
-
-
-                postToApi('cart/updateCarts',{"carts":[{"id":id.dataset.id,"amount":element.value,"total_price":total_price.innerHTML}]})
-                
+                callback=postToApi('cart/updateCarts',{"carts":[{"id":id.dataset.id,"amount":element.value,"total_price":total_price.innerHTML}]})
+                if(callback){
+                    setCartTotalPrice()
+                }
+                else{
+                    alert('something go wrong')
+                }
             }
         
             function setCartTotalPrice(){
                 total_price=0
-                // $('#carttable tbody tr td[name="total_price"]').each(function(){
-                //     total_price+=parseInt($(this).text())
-                // })
-               
-
                 table=$('#carttable tbody tr')
+                
                 
                 $(table).each(function(){
                     box=this.querySelector('td input[name="select"]')
@@ -480,9 +522,8 @@
                     if(box.checked && !$(box).attr('disabled')){
                         total_price+=parseInt(tprice.innerHTML)
                     }
-                })
 
-                console.log(total_price)
+                })
                 $("#total").text('$'+total_price)
 
             }
@@ -549,6 +590,61 @@
             }
         </script>
         
+        <script> //trade funtions
+            function createTrade(){
+                table=$('#carttable tbody tr')
+
+                cartsId=[]
+                
+                $(table).each(function(){
+                    box=this.querySelector('td input[name="select"]')
+                    id=this.querySelector('td[name="id"]')
+                    if(box.checked && !$(box).attr('disabled')){
+                        cartsId.push(parseInt(id.dataset.id))
+                    }
+                })
+
+                if(cartsId.length>0){
+                    postToApi('/trade/create',{'carts':cartsId},()=>{alert('訂單成立');setTrade();})
+
+                }
+                else{
+                    alert('you select nothing')
+                }
+
+                
+            }
+
+            function setTrade(){
+                $("#tradetable tbody tr").each(function(){
+                    $(this).remove()
+                })
+                table = document.getElementById("tradetable").querySelector('tbody');
+                
+                trades=getFromApi('trade')['trades']
+
+                trades.forEach(trade=>{
+                    var row = table.insertRow(-1);
+    
+                    var paytbtn = row.insertCell(0);
+                    var id = row.insertCell(1);
+                    var detail = row.insertCell(2);
+                    var total_price = row.insertCell(3);
+                    var state = row.insertCell(4);
+
+                    paytbtn.innerHTML='<button  onclick="payTrade(this)">pay</button>'
+                    id.innerHTML=trade['id']
+                    detail.innerHTML=trade['detail']
+                    total_price.innerHTML=trade['total_price']
+                    state.innerHTML=trade['state']
+
+        
+                })
+
+
+
+            }
+        </script>
         
         <script>  //user funtions
 

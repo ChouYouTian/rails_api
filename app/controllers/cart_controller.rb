@@ -25,11 +25,13 @@ class CartController < ApplicationController
 
                 if product &&(cart[:product_user_id]==product[:user_id])
 
-                    if cart[:amount]>product[:quentity]
+                    if cart[:amount]>product[:quentity] && cart[:state]=="active"
+                        
                         cart[:msg]="數量不足"
                         cart[:state]="lack"
                         save=true
-                    elsif cart[:msg]!=""
+                    
+                    elsif cart[:state]=="lack"
                         cart[:msg]=""
                         cart[:state]="active"
                         save=true
@@ -45,9 +47,14 @@ class CartController < ApplicationController
 
                 else
                     if cart[:state]!="disable"
-                        cart[:state]="disable"
-                        cart[:msg]="商品不存在"
-                        save=true
+                        if  cart[:state]=="active" || cart[:state]=="lack"
+                            cart[:msg]="商品不存在"
+                            cart[:state]="disable"
+                            save=true
+                        elsif cart[:msg]==""
+                            cart[:msg]="商品不存在"
+                            save=true
+                        end
                     end
 
                     cartinfo={:id=>cart[:id],:amount=>cart[:amount],:total_price=>cart[:total_price],:state=>cart[:state],:msg=>cart[:msg],:name=>nil,:price=>nil,:quentity=>nil}
@@ -97,8 +104,8 @@ class CartController < ApplicationController
             cart.total_price=amount*product[:price]
             cart.product_user_id=product[:user_id]
 
-            cart.save()
-   
+            cart.save(validate: false)  #terrible
+     
 
             @user.carts<<cart
             
@@ -130,7 +137,6 @@ class CartController < ApplicationController
         code=0
         if carts
 
-            cartAtt=Cart.attribute_names()
             carts.each do |c|
           
                 mycart=Cart.find_by(id: c["id"],user_id: @user[:id])
@@ -147,7 +153,7 @@ class CartController < ApplicationController
                         save=true
                     end
                     if save
-                        mycart.save
+                        mycart.save(validate: false)         #terrible way to save
                     end
 
                 else

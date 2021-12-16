@@ -3,55 +3,71 @@ class TradeController < ApplicationController
 
 
     def myTrade
-        render json:@user.trades
+
+        render json:{:code=>0 ,:trades=>@user.trades ,:msg=>""} 
     end
 
 
     #-----createTrade input example----
     # {
-    #     "name":"test", #user name
     #     "carts":[10,...    ]         #cart id
     # }
 
     def create
         cartsId=params[:carts]
-        
-        if @user && cartsId
+
+        carts=Cart.eager_load(:product).where(id: cartsId,user_id: @user.id)
+
+        if cartsId.length()==carts.length()
             detail=""
+            code=0
+            msg=""
             totalPrice=0
-            mycarts=Cart.where(id: cartsId)
-            
-            mycarts.each do |c|
 
-                tempProduct=Product.find(c[:product_id])
+            begin
+                Cart.transaction do
+                    carts.each do |cart|
+                        product=cart.product
+                        
+                        if product[:quentity]<cart[:amount]
+                            msg.concat "#{product[:name]} not enough"
+                            raise
+                        elsif cart[:state]!="active"
+                            msg.concat "cartid:#{cart[:id]} state error"
+                            raise
+                        end
+                        
+                        detail.concat "#{product[:name]}$#{product[:price]}* #{cart[:amount]},"
+                        totalPrice+=product[:price]*cart[:amount]
+
+                        cart[:state]="intrade"
+                        product[:quentity]-=cart[:amount]
+
+                        product.save()
+                        cart.save()
+                    end
+                    
+                    detail.concat "total price: #{totalPrice}"
+                    
+                    trade=Trade.new()
+                    trade[:detail]=detail
+                    trade[:total_price]=totalPrice
+                    trade.carts<<carts
+            
+                    @user.trades<<trade
+                end
+
+                render json:{:code=>0 ,:msg=>"trade created"}
                 
-                if tempProduct[:quentity]<c[:amount]
-                    return render json:JSON.parse("{\"msg\":\"#{tempProduct[:name]} not enough \"}")
-                end
-
-                if c[:user_id]!=@user[:id]
-                    return render json:JSON.parse("{\"msg\":\"#{c[:name]} is not in #{@user[:name]}'s cart \"}")
-                end
-
-                detail.concat "#{tempProduct[:name]}$#{tempProduct[:price]}* #{c[:amount]},"
-                totalPrice+=tempProduct[:price]*c[:amount]
+            rescue
+                render json:{:code=>1 ,:msg=>"fail. #{msg}"}
             end
-            
-            detail.concat "total price: #{totalPrice}"
-            
-            trade=Trade.new()
-            trade[:detail]=detail
-            trade.carts<<mycarts
-
-            @user.trades<<trade
-            
-            render json:JSON.parse("{\"msg\":\"trade active\"}")
-        elsif @user
-            render json:JSON.parse("{\"msg\":\"Did not find carts,pls check params\"}")
         else
-            render json:JSON.parse("{\"msg\":\"user not exsit\"}")
+            render json:{:code=>1 ,:msg=>"cart missing"}
         end
-
+        
+        
+ 
     end
 
     # {
