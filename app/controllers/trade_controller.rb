@@ -73,7 +73,7 @@ class TradeController < ApplicationController
         tid=params[:MerchantTradeNo].slice(12..)
         trade=Trade.find_by(id: tid)
 
-        if params[:RtnCode]==1
+        if params[:RtnCode]=="1"
             trdae.paid!
             return "1|OK"
         else
@@ -88,10 +88,10 @@ class TradeController < ApplicationController
         trade=Trade.find_by(id: tid)
         p trade
 
-        if params[:RtnCode]==1
+        if params[:RtnCode]=="1"
             render html:"<h1>Success</h1>".html_safe
         else
-            render html:"<h1>Faiil #{params[:RtnMsg]}</h1>".html_safe
+            render html:"<h1>Fail #{params[:RtnMsg]}</h1>".html_safe
             
         end
 
