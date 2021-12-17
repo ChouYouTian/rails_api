@@ -1,9 +1,8 @@
 class TradeController < ApplicationController
-    before_action :autenticate_spa_user! , except:[:test]
+    before_action :autenticate_spa_user! , except:[:ecpayClientPage,:ecpayReturn]
 
 
     def myTrade
-
         render json:{:code=>0 ,:trades=>@user.trades ,:msg=>""} 
     end
 
@@ -70,11 +69,32 @@ class TradeController < ApplicationController
  
     end
 
-    def payed
+    def ecpayReturn
+        tid=params[:MerchantTradeNo].slice(10..)
+        trade=Trade.find_by(id: tid)
+
+        if params[:RtnCode]==1
+            trdae.paid!
+            return "1|OK"
+        else
+            trade.fail!
+            return 
+        end
+
     end
 
-    def successPage
-        render html:"<h1>Success</h1>".html_safe
+    def ecpayClientPage
+        tid=params[:MerchantTradeNo].slice(10..)
+        trade=Trade.find_by(id: tid)
+        p trade
+
+        if params[:RtnCode]==1
+            render html:"<h1>Success</h1>".html_safe
+        else
+            render html:"<h1>Faiil #{params[:RtnMsg]}</h1>".html_safe
+            
+        end
+
 
     end
 
@@ -83,22 +103,35 @@ class TradeController < ApplicationController
     # }
     def payByECPay
 
-      
+        tid=params[:trade]
+        trade=Trade.eager_load(carts: :product).find_by(id: tid,user_id: @user[:id])
+
+        items=""
+        trade.carts.each_with_index do |cart,i|
+            tmpP=cart.product
+            if i!=0
+                items.concat "#"
+            end
+            items.concat "#{tmpP[:name]} #{tmpP[:price]}元*#{cart[:amount]}"
+        end
+        
+        time=Time.new
+        trade_no=time.strftime("NO%Y%m%d")+trade[:id].to_s  # NO+strftime (len 10)+trade[id]
+        trade[:trade_no]=trade_no
 
         ## 參數值為[PLEASE MODIFY]者，請在每次測試時給予獨特值
         ## 若要測試非必帶參數請將base_param內註解的參數依需求取消註解 ##
 
-        time=Time.new
         base_param = {
-            'MerchantTradeNo' =>time.strftime("NO%Y%m%d%H%M%S"),  #請帶20碼uid, ex: f0a0d7e9fae1bb72bc93
+            'MerchantTradeNo' =>trade_no,  #請帶20碼uid, ex: f0a0d7e9fae1bb72bc93
             'MerchantTradeDate' => time.strftime("%Y/%m/%d %H:%M:%S"), # ex: 2017/02/13 15:45:30
-            'TotalAmount' => '100',
+            'TotalAmount' => trade[:total_price],
             'PaymentType'=>'aio',
-            'TradeDesc' => '測試交易描述',
-            'ItemName' => '測試商品等',
-            'ReturnURL' => request.base_url+'/trade/payed',
+            'TradeDesc' => 'shopping-api',
+            'ItemName' => items,
+            'ReturnURL' => request.base_url+'/trade/ecpayReturn',
             'ChooseSubPayment' => 'ALL',
-            'OrderResultURL' => request.base_url+'/trade/successPage',
+            'OrderResultURL' => request.base_url+'/trade/ecpayClientPage',
             #'NeedExtraPaidInfo' => '1',
             #'ClientBackURL' => 'https://www.google.com',
             #'ItemURL' => 'http://item.test.tw',
@@ -141,6 +174,12 @@ class TradeController < ApplicationController
        
         create = ECpayPayment::ECpayPaymentClient.new
         htm = create.aio_check_out_all(params: base_param, invoice: inv_params)
+
+        if htm
+            trade.paying!
+        else
+            trade.fail!
+        end
 
         render plain: htm
     end

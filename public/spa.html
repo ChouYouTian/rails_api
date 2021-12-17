@@ -634,6 +634,7 @@
 
                     paytbtn.innerHTML='<button  onclick="payTrade(this)">pay</button>'
                     id.innerHTML=trade['id']
+                    id.setAttribute('name','id')
                     detail.innerHTML=trade['detail']
                     total_price.innerHTML=trade['total_price']
                     state.innerHTML=trade['state']
@@ -645,15 +646,16 @@
 
             }
         
-            function payTrade(){
-
-                // html=postToApi('trade/pay',{})
+            function payTrade(element){
+                parent=element.parentNode.parentNode
+                id=parent.querySelector('td[name="id"]').innerHTML
+   
                 html=""
-
                 $.ajax({ 
                     async:false,
                     url: "trade/pay" ,
-                    type: "GET",
+                    type: "POST",
+                    data:JSON.stringify({"trade":parseInt(id)}),
                     contentType: "application/json;charset=utf-8",
                     success: function(returnData){
                         html=returnData
@@ -663,7 +665,6 @@
                         console.log(thrownError);
                     }}
                 )
-
 
                 w=window.open();
                 $(w.document.body).html(html);
