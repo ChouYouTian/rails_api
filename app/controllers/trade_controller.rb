@@ -70,7 +70,7 @@ class TradeController < ApplicationController
     end
 
     def ecpayReturn
-        tid=params[:MerchantTradeNo].slice(10..)
+        tid=params[:MerchantTradeNo].slice(12..)
         trade=Trade.find_by(id: tid)
 
         if params[:RtnCode]==1
@@ -84,7 +84,7 @@ class TradeController < ApplicationController
     end
 
     def ecpayClientPage
-        tid=params[:MerchantTradeNo].slice(10..)
+        tid=params[:MerchantTradeNo].slice(12..)
         trade=Trade.find_by(id: tid)
         p trade
 
@@ -116,7 +116,7 @@ class TradeController < ApplicationController
         end
         
         time=Time.new
-        trade_no=time.strftime("NO%Y%m%d")+trade[:id].to_s  # NO+strftime (len 10)+trade[id]
+        trade_no=time.strftime("NO%y%m%d%H%M")+trade[:id].to_s  # NO+strftime (len 12)+trade[id]
         trade[:trade_no]=trade_no
 
         ## 參數值為[PLEASE MODIFY]者，請在每次測試時給予獨特值
