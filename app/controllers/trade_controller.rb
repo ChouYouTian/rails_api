@@ -74,7 +74,7 @@ class TradeController < ApplicationController
         trade=Trade.find_by(id: tid)
 
         if params[:RtnCode]=="1"
-            trdae.paid!
+            trade.paid!
             return "1|OK"
         else
             trade.fail!
