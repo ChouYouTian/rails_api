@@ -127,7 +127,7 @@ class TradeController < ApplicationController
             #'NeedExtraPaidInfo' => '1',
             #'ClientBackURL' => 'https://www.google.com',
             #'ItemURL' => 'http://item.test.tw',
-            #'Remark' => '交易備註',
+            'Remark' => items,
             #'StoreID' => '',
             #'CustomField1' => '',
             #'CustomField2' => '',
