@@ -54,7 +54,7 @@ class TradeController < ApplicationController
                     trade.carts<<carts
                     @user.trades<<trade
 
-                    CheckTradeJob.set(wait: 10.seconds).perform_later(trade[:id])
+                    CheckTradeJob.set(wait: 10.minutes).perform_later(trade[:id])
                 end
 
 
