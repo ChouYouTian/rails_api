@@ -71,10 +71,11 @@ class TradeController < ApplicationController
 
         if params[:RtnCode]=="1"
             trade.paid!
-            render plain: "1|OK"
+            render text: "1|OK"
         else
             trade.fail!
-            return 
+            render text: ""
+
         end
 
     end
