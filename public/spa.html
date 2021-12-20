@@ -603,7 +603,7 @@
                 })
 
                 if(cartsId.length>0){
-                    postToApi('/trade/create',{'carts':cartsId},()=>{alert('訂單成立');setTrade();})
+                    postToApi('/trade/create',{'carts':cartsId},()=>{alert('訂單成立  \n10分鐘後未完成付款將取消訂單');setTrade();})
 
                 }
                 else{
