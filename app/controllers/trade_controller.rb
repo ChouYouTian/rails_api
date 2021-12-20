@@ -50,7 +50,10 @@ class TradeController < ApplicationController
 
                     trade.carts<<carts
                     @user.trades<<trade
+
+                    CheckTradeJob.set(wait: 10.minutes).perform_later(trade[:id])
                 end
+
 
                 render json:{:code=>0 ,:msg=>"trade created"}
                 
@@ -107,7 +110,7 @@ class TradeController < ApplicationController
             items.concat "#{tmpP[:name]} #{tmpP[:price]}元*#{cart[:amount]}"
         end
         
-        time=Time.new
+        time=Time.new.getlocal('+08:00')
         trade_no=time.strftime("NO%y%m%d%H%M")+trade[:id].to_s  # NO+strftime (len 12)+trade[id]
         trade[:trade_no]=trade_no
 
@@ -127,7 +130,7 @@ class TradeController < ApplicationController
             #'NeedExtraPaidInfo' => '1',
             #'ClientBackURL' => 'https://www.google.com',
             #'ItemURL' => 'http://item.test.tw',
-            'Remark' => items,
+            # 'Remark' => '交易備註',
             #'StoreID' => '',
             #'CustomField1' => '',
             #'CustomField2' => '',

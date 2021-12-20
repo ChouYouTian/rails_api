@@ -29,6 +29,12 @@ Rails.application.routes.draw do
   post "trade/ecpayReturn"=>"trade#ecpayReturn"
   post "trade/ship"=>"trade#ship"
   post "trade/finish"=>"trade#finish"
+
+
+  require 'sidekiq/web'
+
+  mount Sidekiq::Web => '/sidekiq'
+    
   
 
 

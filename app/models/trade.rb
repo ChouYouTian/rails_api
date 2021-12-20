@@ -7,6 +7,11 @@ class Trade < ApplicationRecord
         self[:state]='fail'
         self.save
     end
+
+    def cancel!
+        self[:state]='cancel'
+        self.save
+    end
     
     def finish!
         self[:state]='finish'
