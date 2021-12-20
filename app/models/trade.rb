@@ -8,8 +8,8 @@ class Trade < ApplicationRecord
         self.save
     end
     
-    def end!
-        self[:state]='end'
+    def finish!
+        self[:state]='finish'
         self.save
     end
     

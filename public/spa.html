@@ -531,8 +531,6 @@
         
         <script> //prvoder funtions
             
-
-            
             function setProviders(){  
                 callback=getFromApi('/product/providers')
                 providers=callback["providers"]
@@ -626,26 +624,61 @@
                 trades.forEach(trade=>{
                     var row = table.insertRow(-1);
     
-                    var paytbtn = row.insertCell(0);
+                    var btns = row.insertCell(0);
                     var id = row.insertCell(1);
                     var detail = row.insertCell(2);
                     var total_price = row.insertCell(3);
                     var state = row.insertCell(4);
 
-                    paytbtn.innerHTML='<button  onclick="payTrade(this)">pay</button>'
-                    id.innerHTML=trade['id']
-                    id.setAttribute('name','id')
-                    detail.innerHTML=trade['detail']
-                    total_price.innerHTML=trade['total_price']
-                    state.innerHTML=trade['state']
+                    btns.innerHTML='<button name="pay"  onclick="payTrade(this)">pay</button> \
+                    <button name="ship"  onclick="ship(this)">ship</button> \
+                    <button name="finish" onclick="finish(this)">finish</button>';
 
-        
+                    id.innerHTML=trade['id'];
+                    id.setAttribute('name','id');
+                    detail.innerHTML=trade['detail'];
+                    total_price.innerHTML=trade['total_price'];
+                    state.innerHTML=trade['state'];
+
+                    paybtn=btns.querySelector('button[name="pay"]');
+                    shipbtn=btns.querySelector('button[name="ship"]');
+                    finishbtn=btns.querySelector('button[name="finish"]');
+
+                    if(trade['state']=='start'){
+                        shipbtn.setAttribute('disabled',1);
+                        finishbtn.setAttribute('disabled',1);
+                    }
+                    else if(trade['state']=='paid'){
+                        paybtn.setAttribute('disabled',1)
+                        finishbtn.setAttribute('disabled',1)
+                    }
+                    else if(trade['state']=='shipping'){
+                        paybtn.setAttribute('disabled',1)
+                        shipbtn.setAttribute('disabled',1)
+                    }
+                    else{
+                        paybtn.setAttribute('disabled',1);
+                        shipbtn.setAttribute('disabled',1);
+                        finishbtn.setAttribute('disabled',1);
+                    }
                 })
+            }
+            
+            function ship(element){
+                parent=element.parentNode.parentNode
+                id=parent.querySelector('td[name="id"]').innerHTML
 
-
+                postToApi("/trade/ship",{"trade":parseInt(id)},()=>{setTrade()})
 
             }
-        
+            function finish(element){
+                parent=element.parentNode.parentNode
+                id=parent.querySelector('td[name="id"]').innerHTML
+
+                postToApi("/trade/finish",{"trade":parseInt(id)},()=>{setTrade()})
+
+            }
+
             function payTrade(element){
                 parent=element.parentNode.parentNode
                 id=parent.querySelector('td[name="id"]').innerHTML

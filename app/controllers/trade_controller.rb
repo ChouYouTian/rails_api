@@ -17,7 +17,7 @@ class TradeController < ApplicationController
 
         carts=Cart.eager_load(:product).where(id: cartsId,user_id: @user.id)
 
-        if cartsId.length()==carts.length()
+        if cartsId.size()==carts.size()
             detail=""
             code=0
             msg=""
@@ -36,23 +36,19 @@ class TradeController < ApplicationController
                             raise
                         end
                         
-                        detail.concat "#{product[:name]}$#{product[:price]}* #{cart[:amount]},"
+                        detail.concat "#{product[:name]} $#{product[:price]}* #{cart[:amount]}," 
                         totalPrice+=product[:price]*cart[:amount]
 
                         cart[:state]="intrade"
                         product[:quentity]-=cart[:amount]
 
-                        product.save()
-                        cart.save()
                     end
                     
                     detail.concat "total price: #{totalPrice}"
                     
-                    trade=Trade.new()
-                    trade[:detail]=detail
-                    trade[:total_price]=totalPrice
+                    trade=Trade.new(detail: detail,total_price: totalPrice )
+
                     trade.carts<<carts
-            
                     @user.trades<<trade
                 end
 
@@ -75,7 +71,7 @@ class TradeController < ApplicationController
 
         if params[:RtnCode]=="1"
             trade.paid!
-            return "1|OK"
+            render plain: "1|OK"
         else
             trade.fail!
             return 
@@ -85,17 +81,12 @@ class TradeController < ApplicationController
 
     def ecpayClientPage
         tid=params[:MerchantTradeNo].slice(12..)
-        trade=Trade.find_by(id: tid)
-        p trade
 
         if params[:RtnCode]=="1"
             render html:"<h1>Success</h1>".html_safe
         else
             render html:"<h1>Fail #{params[:RtnMsg]}</h1>".html_safe
-            
         end
-
-
     end
 
     # {
@@ -184,27 +175,23 @@ class TradeController < ApplicationController
         render plain: htm
     end
 
-    def update
-        @trade=Trade.find(params[:id])
-        state=params[:state]
 
-        if @trade
-            @trade[:state]=state
+    def ship
+        trade=Trade.find_by(id: params[:trade],user_id: @user[:id])
+        if trade.shipping!
+            render json:{:code=>0,:mag=>""}
         else
-            render json:JSON.parse("{\"msg\":\"trade not exsit\"}")
+            render json:{:code=>1,:mag=>"can't find trade in #{@user[:name]}'s trades'"}
         end
-
-        
     end
 
+
     def finish
-        @trade=Trade.find(params[:id])
-
-
-        if @trade
-            @trade[:state]="finished"
+        trade=Trade.find_by(id: params[:trade],user_id: @user[:id])
+        if trade.finish!
+            render json:{:code=>0,:mag=>""}
         else
-            render json:JSON.parse("{\"msg\":\"trade finish\"}")
+            render json:{:code=>1,:mag=>"can't find trade in #{@user[:name]}'s trades'"}
         end
     end
 end
