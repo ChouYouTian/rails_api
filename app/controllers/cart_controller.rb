@@ -10,6 +10,8 @@ class CartController < ApplicationController
         render json: carts
     end
 
+    
+
     def myCart
         carts=Cart.eager_load(:product).where(user_id: @user.id)
 
@@ -105,9 +107,6 @@ class CartController < ApplicationController
             cart.product_user_id=product[:user_id]
 
             cart.save(validate: false)  #terrible
-     
-
-            @user.carts<<cart
             
             render json:{:code=>0,:msg=>'cart added'}    
         else

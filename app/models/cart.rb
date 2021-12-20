@@ -8,6 +8,11 @@ class Cart < ApplicationRecord
         self.save
     end
 
+    def cancel!
+        self[:state]="cancel"
+        self.save
+    end
+    
     def fail!
         self[:state]="fail"
         self.save

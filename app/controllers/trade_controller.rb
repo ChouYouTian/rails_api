@@ -40,7 +40,10 @@ class TradeController < ApplicationController
                         totalPrice+=product[:price]*cart[:amount]
 
                         cart[:state]="intrade"
-                        product[:quentity]-=cart[:amount]
+                        product[:quentity]= product[:quentity]-cart[:amount]
+
+                        cart.save
+                        product.save
 
                     end
                     
@@ -51,7 +54,7 @@ class TradeController < ApplicationController
                     trade.carts<<carts
                     @user.trades<<trade
 
-                    CheckTradeJob.set(wait: 1.minutes).perform_later(trade[:id])
+                    CheckTradeJob.set(wait: 10.seconds).perform_later(trade[:id])
                 end
 
 
