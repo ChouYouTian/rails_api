@@ -2,12 +2,8 @@ class ProductController < ApplicationController
     before_action :autenticate_spa_user! ,only: [:addProducts,:updateProducts,:deleteProducts]
 
     def getProviders
-        providers=User.all
-        plist=[]
+        plist=User.get_provider
 
-        providers.each_with_index do |p,i|
-            plist<<{"name":p[:name],"id":p[:id]}
-        end
         render json:{
             :code=>0,
             :providers=>plist
@@ -26,14 +22,8 @@ class ProductController < ApplicationController
     #          {...}
     #      ]
     #  }
-
     def getProducts
-        products=Product.where(user_id: params[:id])
-        products_info=[]
-
-        products.each do |product|
-            products_info<<product.get_info
-        end
+        products_info=Product.get_products_by_userId(params[:id])
 
         render json:{
             :code=>0,
@@ -55,7 +45,6 @@ class ProductController < ApplicationController
     #     ]
     # }
     def addProducts
-
         products=params[:products]
         msg=""
         code=0

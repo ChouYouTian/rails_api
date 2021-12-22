@@ -20,4 +20,16 @@ class User < ApplicationRecord
             return false
         end
     end
+
+    def self.get_provider
+        providers=User.all
+        plist=[]
+
+        providers.each_with_index do |p,i|
+            plist<<{"name":p[:name],"id":p[:id]}
+        end
+        return plist
+    end
+
+    
 end
