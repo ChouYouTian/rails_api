@@ -437,7 +437,7 @@
                     if(cart['state']=="lack"){
                         selectbox.querySelector("input").disabled=true
                     }
-                    else if(cart['state']=="disable" || cart['state']=="intrade" ){
+                    else if(cart['state']=="disable" || cart['state']=="intrade" || cart['state']=="cancel" ){
                         selectbox.querySelector("input").disabled=true
                         amount.innerHTML=cart["amount"]
                         deletebtn.querySelector("button").disabled=true
