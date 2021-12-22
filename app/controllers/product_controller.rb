@@ -46,38 +46,9 @@ class ProductController < ApplicationController
     # }
     def addProducts
         products=params[:products]
-        msg=""
-        code=0
 
         if products
-            newProducts=[]
-            myproductnames=@user.products.map {|p| p[:name]}
-
-            products.each do |p|
-                if myproductnames.include? p[:name]  #check is product exist
-                    msg.concat " #{p[:name]} product allready exsit,"
-                    code=2
-                    next
-                end
-
-                np=Product.new(name: p[:name]) #new product
-
-                price=p[:price]
-                quentity=p[:quentity]
-
-                if price
-                    np[:price]=price
-                end
-                if quentity
-                    np[:quentity]=quentity
-                end
-
-                newProducts<<np
-                msg.concat " #{p[:name]} product added,"
-            end
-
-            @user.products<<newProducts
-
+           code,msg=Product.add_products @user,products
             
             if code==0
                 render json:{
@@ -91,7 +62,6 @@ class ProductController < ApplicationController
                 }
             end
 
-       
         else
             render json:{
                 :code=>1,
@@ -119,45 +89,9 @@ class ProductController < ApplicationController
     def updateProducts
 
         products=params[:products]
-        msg=""
-        code=0
-
-        if products
-
-            pids=[]
-            hashPorducts={}
-
-            products.each do |p|
-                pids<<p[:id]
-                hashPorducts[p[:id].to_i]=p #tern products from array to hash by id
-
-            end
    
-
-            myproducts=Product.where(id: pids,user_id: @user[:id])
-
-            myProductsName=@user.products.map {|p| p[:name]}
-
-            myproducts.each do |p|
-                id=p[:id]
-
-                if hashPorducts[id][:name] && hashPorducts[id][:name]!=p[:name]  #check is name been taken
-                    if myProductsName.include? hashPorducts[id][:name]
-                        msg.concat " #{p[:name]} can't chage to #{hashPorducts[id][:name]},"
-                        code=2
-                    else
-                        p[:name]=hashPorducts[id][:name]
-                    end
-                end
-                if hashPorducts[id][:price] 
-                    p[:price]=hashPorducts[id][:price]
-                end
-                if hashPorducts[id][:quentity]
-                    p[:quentity]=hashPorducts[id][:quentity]
-                end
-                p.save
-                    
-            end
+        if products
+            code,msg=Product.update_products @user,products
             
             if code==0
                 render json:{
@@ -185,21 +119,10 @@ class ProductController < ApplicationController
     def deleteProducts
 
         products=params[:products]
-        msg=""
-        code=0
 
         if products
- 
-            products.each do |p|
-                myproduct=Product.find_by(id: p,user_id: @user[:id])
-                if myproduct
-                    myproduct.destroy
-                    msg.concat "delete #{myproduct[:id]}, "
-                else
-                    msg.concat "can't find #{p} in #{@user[:name]}'s cart,"
-                    code=2
-                end
-            end
+
+            code,msg=Product.delete_products @user,products
 
             if code==0
                 render json:{

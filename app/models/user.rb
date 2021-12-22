@@ -31,5 +31,5 @@ class User < ApplicationRecord
         return plist
     end
 
-    
+
 end
