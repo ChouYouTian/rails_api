@@ -3,55 +3,42 @@ class ProductController < ApplicationController
 
     def getProviders
         providers=User.all
-        len=providers.length()-1
-        # json="["
         plist=[]
 
         providers.each_with_index do |p,i|
-            # json.concat "{\"name\" : #{p[:name]} \"id\": #{p[:id]} }"
-
-            
-            # if i!=len
-            #     json.concat ","
-            # end
-
             plist<<{"name":p[:name],"id":p[:id]}
         end
-
-        # json.concat "]"
-
-        # render json:JSON.parse(json)
-
         render json:{
             :code=>0,
             :providers=>plist
         }
     end
 
+     #-----getProducts output example----
+    #  {
+    #      "products":[
+    #          {
+    #              "id":1,
+    #              "name":'productname',
+    #              "price":20,
+    #              "quentity":100
+    #          },
+    #          {...}
+    #      ]
+    #  }
+
     def getProducts
-        # provider=User.find_by(id: params[:id])
         products=Product.where(user_id: params[:id])
-        # len=providers.products.length()
+        products_info=[]
 
-        # json="{\"products\":["
+        products.each do |product|
+            products_info<<product.get_info
+        end
 
-        # providers.products.each_with_index  do |p,i|
-        #     if i!=0 && len!=1
-        #         json.concat ","
-        #     end
-        #     json.concat "\"#{p.name}\""
-        # end
-
-        # json.concat "]}"
-
-        # render json:JSON.parse(json)
-
-        # render json:provider.products
         render json:{
             :code=>0,
-            :products=>products
+            :products=>products_info
         }
-        
     end
 
     #-----addProducts input example----
@@ -73,7 +60,7 @@ class ProductController < ApplicationController
         msg=""
         code=0
 
-        if @user && products
+        if products
             newProducts=[]
             myproductnames=@user.products.map {|p| p[:name]}
 
@@ -89,11 +76,10 @@ class ProductController < ApplicationController
                 price=p[:price]
                 quentity=p[:quentity]
 
-                if price!=""
-     
+                if price
                     np[:price]=price
                 end
-                if quentity!=""
+                if quentity
                     np[:quentity]=quentity
                 end
 

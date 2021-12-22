@@ -1,16 +1,14 @@
 class UsersController < ApplicationController
     before_action :autenticate_spa_user! ,only: [:delete]
     
-    def index
-        render plain:"success"
-    end
+
 
     def login
         @user=User.find_by(name:params[:name])
 
         if @user
             session[:user_id] = @user.id
-            # render plain:"#{@user[:id]} #{@user[:name]}"
+
             render json:{
                 :code=>0,
                 :user_id=>@user[:id],
@@ -43,8 +41,6 @@ class UsersController < ApplicationController
 
     def signup
         @user=User.find_by(email: params[:email])
-        email=params[:email]
-        name=params[:name]
 
         if @user
             render json:{
@@ -52,10 +48,7 @@ class UsersController < ApplicationController
                 :msg=>"User already exist" 
             }
         elsif email && name
-
-            @user=User.new
-            @user.name=params[:name]
-            @user.email=params[:email]
+            @user=User.new(name: params[:name],email: params[:email])
 
             if @user.save
                 render json:{
@@ -78,22 +71,13 @@ class UsersController < ApplicationController
     end
 
     def delete
-        
-        begin 
-            @user.transaction do
-                
-                @user.carts.each {|c| c.destroy!}
-                @user.products.each {|p| p.destroy!}
-                @user.trades.each {|t| t.destroy!}
 
-                @user.destroy!
-
-            end
+        if @user.delete_user
             render json:{
                 :code=>0,
                 :msg=>"Success"
             }
-        rescue 
+        else
             render json:{
                 :code=>1,
                 :msg=>"fail"

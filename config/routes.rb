@@ -3,7 +3,7 @@ Rails.application.routes.draw do
 
   get "/",to: redirect("spa.html")
 
-  get "user"=>"users#index"
+
   get "user/logout"=>"users#logout"
   get "user/delete"=>"users#delete"
   post "user/login"=>"users#login"
