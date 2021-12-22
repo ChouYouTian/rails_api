@@ -10,6 +10,11 @@ class Trade < ApplicationRecord
 
     def cancel!
         self[:state]='cancel'
+        
+        self.carts do |cart|
+            cart.cancel!
+        end
+        
         self.save
     end
     

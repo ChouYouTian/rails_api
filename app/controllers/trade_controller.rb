@@ -54,7 +54,7 @@ class TradeController < ApplicationController
                     trade.carts<<carts
                     @user.trades<<trade
 
-                    CheckTradeJob.set(wait: 10.minutes).perform_later(trade[:id])
+                    CheckTradeJob.set(wait: 10.seconds).perform_later(trade[:id])
                 end
 
 
@@ -185,7 +185,8 @@ class TradeController < ApplicationController
 
     def ship
         trade=Trade.find_by(id: params[:trade],user_id: @user[:id])
-        if trade.shipping!
+        if trade
+            trade.shipping!
             render json:{:code=>0,:mag=>""}
         else
             render json:{:code=>1,:mag=>"can't find trade in #{@user[:name]}'s trades'"}
@@ -194,8 +195,9 @@ class TradeController < ApplicationController
 
 
     def finish
-        trade=Trade.find_by(id: params[:trade],user_id: @user[:id])
-        if trade.finish!
+        trade=Trade.eager_load(:carts).find_by(id: params[:trade],user_id: @user[:id])
+        if trade
+            trade.finish!
             render json:{:code=>0,:mag=>""}
         else
             render json:{:code=>1,:mag=>"can't find trade in #{@user[:name]}'s trades'"}
