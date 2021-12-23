@@ -72,4 +72,85 @@ class Cart < ApplicationRecord
         return selfinfo
     end
 
+    def self.create_cart(user,proudct_id,amount)
+        code=0
+        msg=""
+
+        product=Product.find_by(id: proudct_id)
+
+        if product
+            cart=Cart.new()
+
+            cart.user_id=user[:id]
+            cart.product_id=product[:id]
+            cart.amount=amount
+            cart.total_price=amount*product[:price]
+            cart.product_user_id=product[:user_id]
+
+            cart.save(validate: false)  #terrible
+
+        else
+            code=1
+            msg='Did not find product'
+        end
+
+        return code,msg
+    end
+
+    def self.update_carts(user,carts)
+        msg=""
+        code=0
+
+        hashCarts={}
+        cid=[]
+        carts.each do |cart|
+            cid<<cart[:id].to_i
+            hashCarts[cart[:id]]=cart
+        end
+
+        mycarts=Cart.where(id: cid,user_id: user[:id])
+
+        mycarts.each do |mycart|
+            cart=hashCarts[mycart[:id].to_s]
+
+            if cart[:amount]
+                mycart[:amount]=cart[:amount]
+                mycart.save(validate: false)         #terrible way to save
+                cid.delete(mycart[:id])
+            end
+        end
+
+        unless cid.empty?
+            code=2
+            msg.concat " cartid:#{cid} not in #{user[:name]}\'s cart,"
+        end
+
+        return code,msg
+    end
+
+    def self.delete_carts(user,carts)
+        msg=""
+        code=0
+        
+        mycarts=user.carts.where(id: carts)
+
+        if mycarts.size == carts.size
+
+            begin
+                Cart.transaction do 
+                    mycarts.each {|mycart| mycart.destroy }
+                end
+            rescue
+                code=2
+                msg="something goes wrong ,try later"
+            end
+        else
+            code=1
+            msg="can't find all carts in #{user[:name]}'s carts"
+        end
+
+        return code,msg
+    end
+
+    
 end

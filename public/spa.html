@@ -467,7 +467,7 @@
                 parent=element.parentNode.parentNode
                 id=parent.querySelector('td[name="id"]').dataset.id
 
-                amount=parent.querySelector('input[name="amount"]').value
+                amount=parseInt(parent.querySelector('input[name="amount"]').value)
 
                 if(amount==0){
                     alert('Amount can\'t be 0')
@@ -503,13 +503,9 @@
 
                 total_price.innerHTML=parseInt(price.innerHTML)*element.value
 
-                callback=postToApi('cart/updateCarts',{"carts":[{"id":id.dataset.id,"amount":element.value,"total_price":total_price.innerHTML}]})
-                if(callback){
-                    setCartTotalPrice()
-                }
-                else{
-                    alert('something go wrong')
-                }
+                postToApi('cart/updateCarts',{"carts":[{"id":id.dataset.id,"amount":element.value,"total_price":total_price.innerHTML}]},
+                ()=>{setCartTotalPrice()})
+
             }
         
             function setCartTotalPrice(){

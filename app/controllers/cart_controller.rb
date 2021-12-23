@@ -39,31 +39,10 @@ class CartController < ApplicationController
     #     
     # }
     def addToCart
-        product=Product.find_by(id: params[:product][:id])
-        
-        amount=params[:product][:amount].to_i
-        if !amount
-            amount=1            
-        end
 
-        if amount > product[:quentity]  
-            render json:{:code=>1,:msg=>'Insufficient quantity'}
+        code,msg=Cart.create_cart(@user,params[:product][:id],params[:product][:amount])
 
-        elsif product
-            cart=Cart.new()
-
-            cart.user_id=@user[:id]
-            cart.product_id=product[:id]
-            cart.amount=amount
-            cart.total_price=amount*product[:price]
-            cart.product_user_id=product[:user_id]
-
-            cart.save(validate: false)  #terrible
-
-            render json:{:code=>0,:msg=>'cart added'}    
-        else
-            render json:{:code=>1,:msg=>'Did not find product'}
-        end
+        render json:{:code=>code,:msg=>msg}
     end
 
 
@@ -82,43 +61,16 @@ class CartController < ApplicationController
     # }
     def updateCarts
         carts=params[:carts]
-        msg=""
-        code=0
-        if carts
+        
+        code,msg=Cart.update_carts(@user,carts)
 
-            carts.each do |cart|
-          
-                mycart=Cart.find_by(id: cart["id"],user_id: @user[:id])
-                amount=cart[:amount]
-                total_price=cart[:total_price]
-                save=false
-                if mycart 
-                    if amount
-                        mycart[:amount]=amount
-                        save=true
-                    end
-                    if total_price
-                        mycart[:total_price]=total_price
-                        save=true
-                    end
-                    if save
-                        mycart.save(validate: false)         #terrible way to save
-                    end
-
-                else
-                    msg.concat " cart:#{cart[:id]} not in #{@user[:name]}\'s cart,"
-                    code=2
-                end
-            end
-            if code==0
-                render json:{:code=>0,:msg=>'cart updated'} 
-            else
-                render json:{:code=>2,:msg=>msg} 
-            end
+        if code==0
+            render json:{:code=>0,:msg=>'cart updated'}
+        elsif code==2
+            render json:{:code=>2,:msg=>msg} 
         else
             render json:{:code=>1,:msg=>'Did not find carts ,check params'} 
         end
-
     end
 
 
@@ -128,23 +80,9 @@ class CartController < ApplicationController
     # }
     def deleteCarts
         carts=params[:carts]
-        msg=""
-        code=0
-        if carts
-            mycarts=Cart.where(id:carts,user_id:@user[:id])
-
-            mycarts.each do |mycart|
-                mycart.destroy
-                msg.concat "delete #{mycart.id}, "
-    
-            end
-     
-            
-            render json:{:code=>code ,:msg=>msg}
         
-        else
-            render json:{:code=>1 ,:msg=>"{\"msg\":\"Did not find carts ,check params\"}"}
-        end
+        code,msg=Cart.delete_carts(@user,carts)
 
+        render json:{:code=>code,:msg=>msg}
     end
 end
