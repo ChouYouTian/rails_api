@@ -26,10 +26,10 @@ Rails.application.routes.draw do
   post "trade/finish"=>"trade#finish"
 
   post "ecpay/pay"=>"ecpay#payByECPay"
-  get "ecpay/ecpayClientPage"=>"ecpay#ecpayClientPage"
+  post "ecpay/ecpayClientPage"=>"ecpay#ecpayClientPage"
   post "ecpay/ecpayReturn"=>"ecpay#ecpayReturn"
 
-
+  
   require 'sidekiq/web'
 
   mount Sidekiq::Web => '/sidekiq'
