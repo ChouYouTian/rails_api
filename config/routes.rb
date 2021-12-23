@@ -3,13 +3,11 @@ Rails.application.routes.draw do
 
   get "/",to: redirect("spa.html")
 
-  get "user"=>"users#index"
+
   get "user/logout"=>"users#logout"
   get "user/delete"=>"users#delete"
   post "user/login"=>"users#login"
   post "user/signup"=>"users#signup"
-
-
 
   get "product/providers"=>"product#getProviders"
   get "product/products"=>"product#getProducts"
@@ -24,11 +22,12 @@ Rails.application.routes.draw do
 
   get "trade"=>"trade#myTrade"
   post "trade/create"=>"trade#create"
-  post "trade/pay"=>"trade#payByECPay"
-  post "trade/ecpayClientPage"=>"trade#ecpayClientPage"
-  post "trade/ecpayReturn"=>"trade#ecpayReturn"
   post "trade/ship"=>"trade#ship"
   post "trade/finish"=>"trade#finish"
+
+  post "ecpay/pay"=>"ecpay#payByECPay"
+  post "ecpay/ecpayClientPage"=>"ecpay#ecpayClientPage"
+  post "ecpay/ecpayReturn"=>"ecpay#ecpayReturn"
 
 
   require 'sidekiq/web'
