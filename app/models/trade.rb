@@ -79,7 +79,7 @@ class Trade < ApplicationRecord
                     detail.concat "total price: #{totalPrice}"
                     trade.update(detail: detail,total_price: totalPrice)
                     user.trades<<trade
-                    CheckTradeJob.set(wait: 10.seconds).perform_later(trade[:id])
+                    CheckTradeJob.set(wait: 10.minutes).perform_later(trade[:id])
                 end
               
                 code=0
