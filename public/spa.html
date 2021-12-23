@@ -437,7 +437,11 @@
                     if(cart['state']=="lack"){
                         selectbox.querySelector("input").disabled=true
                     }
-                    else if(cart['state']=="disable" || cart['state']=="intrade" || cart['state']=="cancel" ){
+                    else if(cart['state']=="disable"){
+                        selectbox.querySelector("input").disabled=true
+                        amount.innerHTML=cart["amount"]
+                    }
+                    else if( cart['state']=="intrade" || cart['state']=="cancel" ){
                         selectbox.querySelector("input").disabled=true
                         amount.innerHTML=cart["amount"]
                         deletebtn.querySelector("button").disabled=true
@@ -445,8 +449,6 @@
                         deletebtn.querySelector("button").classList.add('btn-outline-danger')
                     }
             
-                 
-                
                     $(id).hide();
                     $(id).attr('name','id')
                     $(id).attr('data-id',cart['id'])
@@ -684,7 +686,7 @@
                 html=""
                 $.ajax({ 
                     async:false,
-                    url: "trade/pay" ,
+                    url: "ecpay/pay" ,
                     type: "POST",
                     data:JSON.stringify({"trade":parseInt(id)}),
                     contentType: "application/json;charset=utf-8",

@@ -9,8 +9,6 @@ Rails.application.routes.draw do
   post "user/login"=>"users#login"
   post "user/signup"=>"users#signup"
 
-
-
   get "product/providers"=>"product#getProviders"
   get "product/products"=>"product#getProducts"
   post "product/addProducts"=>"product#addProducts"
@@ -24,11 +22,12 @@ Rails.application.routes.draw do
 
   get "trade"=>"trade#myTrade"
   post "trade/create"=>"trade#create"
-  post "trade/pay"=>"trade#payByECPay"
-  post "trade/ecpayClientPage"=>"trade#ecpayClientPage"
-  post "trade/ecpayReturn"=>"trade#ecpayReturn"
   post "trade/ship"=>"trade#ship"
   post "trade/finish"=>"trade#finish"
+
+  post "ecpay/pay"=>"ecpay#payByECPay"
+  post "ecpay/ecpayClientPage"=>"ecpay#ecpayClientPage"
+  post "ecpay/ecpayReturn"=>"ecpay#ecpayReturn"
 
 
   require 'sidekiq/web'
