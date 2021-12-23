@@ -23,7 +23,7 @@ class TradeController < ApplicationController
     #     "trade":1        # id
     # }
     def ship
-        trade=@user.trades.find(id: params[:trade])
+        trade=@user.trades.find(params[:trade])
         if trade
             trade.shipping!
             render json:{:code=>0,:mag=>""}
@@ -38,7 +38,7 @@ class TradeController < ApplicationController
     #     "trade":1        # id
     # }
     def finish
-        trade=@user.trades.find(id: params[:trade])
+        trade=@user.trades.find(params[:trade])
         if trade
             trade.finish!
             render json:{:code=>0,:mag=>""}
