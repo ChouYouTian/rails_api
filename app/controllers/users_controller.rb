@@ -7,7 +7,7 @@ class UsersController < ApplicationController
         @user=User.find_by(name:params[:name])
 
         if @user
-            session[:user_id] = @user.id
+            session[:user_id] = { value: @user.id, expires: Time.now + 600}
 
             render json:{
                 :code=>0,
@@ -23,18 +23,11 @@ class UsersController < ApplicationController
     end
 
     def logout
-        if session[:user_id]
-            session.delete(:user_id)
-            render json:{
-                :code=>0,
-                :msg=>"Logout"   
-            }
-        else
-            render json:{
-                :code=>1,
-                :msg=>"user not found"   
-            }
-        end
+        session.delete(:user_id)
+        render json:{
+            :code=>0,
+            :msg=>"Logout"   
+        }
     end
 
 

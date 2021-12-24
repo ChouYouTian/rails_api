@@ -205,6 +205,11 @@
                             successfun();
                             callback=true
                         }
+                        else if (returnData['code']==8){
+                            sessionStorage.setItem("login","false");
+                            alert(returnData['msg']);
+                            refresh()
+                        }
                         else{
                             alert(returnData['msg']);
                             failfun();
@@ -219,7 +224,7 @@
             }
         
             function getFromApi(url){
-                var callback
+                var callback=""
                 $.ajax({ 
                     async:false,
                     url: url ,
@@ -228,6 +233,11 @@
                     success: function(returnData){
                         if (returnData['code']==0){
                             callback=returnData
+                        }
+                        else if (returnData['code']==8){
+                            sessionStorage.setItem("login","false");
+                            alert(returnData['msg']);
+                            refresh()
                         }
                         else{
                             alert(returnData['msg']);

@@ -61,7 +61,7 @@ class EcpayController < ApplicationController
             'ItemName' => items,
             'ReturnURL' => request.base_url+'/ecpay/ecpayReturn',
             'ChooseSubPayment' => 'ALL',
-            'OrderResultURL' => request.base_url+'/ecapy/ecpayClientPage',
+            'OrderResultURL' => request.base_url+'/ecpay/ecpayClientPage',
             #'NeedExtraPaidInfo' => '1',
             #'ClientBackURL' => 'https://www.google.com',
             #'ItemURL' => 'http://item.test.tw',
