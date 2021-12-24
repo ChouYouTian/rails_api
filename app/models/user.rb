@@ -2,9 +2,10 @@ class User < ApplicationRecord
     has_many:products
     has_many:carts
     has_many:trades
+    has_secure_password
 
 
-    def delete_user
+    def delete_user!
         begin 
             self.transaction do
                 
@@ -13,7 +14,6 @@ class User < ApplicationRecord
                 self.trades.each {|t| t.destroy!}
 
                 self.destroy!
-
             end
             return true
         rescue 

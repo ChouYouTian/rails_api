@@ -7,47 +7,83 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
- 
+        <link href="./main.css" rel="stylesheet">
     </head>
     <body>
-    
-        <main class=" container  ">
-            
 
-            <div id="login" class="row" >
-                <div class="col-sm-3"></div>
-                <div class="col-sm-6 text-center">
+        <main class="container-fluid">
+            
+            <div id="login" class="row  justify-content-center" >
+                <!-- <div class="col"></div> -->
+                <div class="main col col-md-5 col-xl-4  text-center">
                     
                         <h1>Login</h1>
                         <div class="form-floating">
-                            <input id="name" type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-                            <label for="floatingInput">Name</label>
+                            <input id="loginEmail" type="email" class="form-control"  placeholder="Password">
+                            <label for="loginEmail">Email</label>
                         </div>
                         <div class="form-floating">
-                            <input id="email" type="password" class="form-control" id="floatingPassword" placeholder="Password">
-                            <label for="floatingPassword">Email</label>
+                            <input id="loginPassword" type="password" class="form-control"  placeholder="Password">
+                            <label for="loginPassword">Password</label>
                         </div>
                         
                         <button id="btnlogin" class="mt-2 w-50 btn btn-lg btn-primary" onclick="login()">login</button>
-                        <button id="btnsignup" class="mt-2 w-50 btn btn-lg btn-primary" onclick="signup()">Signup</button>
-                    
+                        <div class="mt-3">
+                            <a href="" onclick="signupPage()">Signup account</a>
+                        </div>
                     
                 </div>
-                <div class="col-sm-3"></div>
+                <!-- <div class="col"></div> -->
             </div>
 
-            <div id="mainpage" class=" mt-3" style="display: none;">
-                <div class="row">
-                    <h1 class="col-sm-6" id="hello">Hello,user</h1>
-                    <button class="col-sm-3 btn btn-lg btn-danger" onclick="deleteUser()">Delete User</button>
+            <div id="signup" class="row justify-content-center" style="display: none;">
+               
+                <div class="main col col-md-5 col-xl-4 text-center">
+                    
+                        <h1>Signup</h1>
+                        <div class="form-floating">
+                            <input id="signupName" type="text" class="form-control"  placeholder="name@example.com">
+                            <label for="signupName">Name</label>
+                        </div>
+                        <div class="form-floating">
+                            <input id="signupEmail" type="email" class="form-control"  placeholder="Password">
+                            <label for="signupEmail">Email</label>
+                        </div>
+                        <div class="form-floating">
+                            <input id="signupPassword" type="password" class="form-control"  placeholder="Password">
+                            <label for="signupPassword">Password</label>
+                        </div>
+                        <div class="form-floating">
+                            <input id="signupCpassword" type="password" class="form-control"  placeholder="Password">
+                            <label for="signupCpassword">Confirm Password</label>
+                        </div>
+                        
+                        <button id="btnsignup" class="mt-2 w-50 btn btn-lg btn-light" onclick="signup()">Signup</button>
+                        <div class="mt-3">
+                            <a href="" onclick="loginPage()">Login</a>
+                        </div>
+                    
+                </div>
+              
+            </div>
 
-                    <button id="btnlogout" class="col-sm-3 btn btn-lg btn-primary" onclick="logout()">Logout</button>
+            
+
+
+
+
+            <div id="mainpage" class="" style="display: none;">
+                <div class="row  justify-content-center">
+                    <h1 class="col-sm-6" id="hello">Hello,user</h1>
+                    <button class="col-sm-2 btn btn-lg btn-danger" onclick="deleteUser()">Delete User</button>
+
+                    <button class="col-sm-2 btn btn-lg btn-primary" onclick="logout()">Logout</button>
                 </div>
                 
                 <!-- myproduct -->
                 <div class="container my-5 py-3 border rounded-3">
                     <h4>My product</h4>
-                    <table id="myproducttable" class="table table-hover  ">
+                    <table id="myproducttable" class="table table-hover">
                         <thead>
                             <tr><th></th>
                                 <th>Product name</th>
@@ -74,7 +110,7 @@
                             <span class="input-group-text ">Quentity</span>
                             <input type="number"  name="quentity" min="0" max="500" class="form-control">
                             
-                            <button class="btn btn-info" onclick="createProduct(this)">create</button>
+                            <button class="btn btn-primary" onclick="createProduct(this)">create</button>
                         </div>
                     </div>
                 </div>
@@ -86,7 +122,7 @@
                         <option selected>Select provider</option>
                     </select>
                     
-                    <table id="producttable" class="table table-hover  mt-3">
+                    <table id="producttable" class="table table-hover ">
                         <thead>
                             <tr>
                                 <th>Product name</th>
@@ -108,7 +144,7 @@
                 <!-- cart -->
                 <div class="container my-5 py-3 border rounded-3"> 
                     <h4>My cart</h4>
-                    <table id="carttable" class="table table-hover  mt-3" style="text-align:center">
+                    <table id="carttable" class="table table-hover" style="text-align:center">
                         <thead>
                             <tr>
                                 <th>Select</th>
@@ -134,7 +170,7 @@
                               <td></td>
                               <td></td>
                               <td></td>
-                              <td><button class="btn btn-outline-dark" onclick="createTrade()">結帳</button></td>
+                              <td><button class="btn btn-primary" onclick="createTrade()">結帳</button></td>
                             </tr>
                         </tfoot> 
                     </table>
@@ -143,7 +179,7 @@
                 <!-- mytrade -->
                 <div class="container my-5 py-3 border rounded-3">
                     <h4>My trade</h4>
-                    <table id="tradetable" class="table table-hover  mt-3" style="text-align:center">
+                    <table id="tradetable" class="table table-hover" style="text-align:center">
                         <thead>
                             <tr>
                                 <th></th>
@@ -163,15 +199,13 @@
             
             
             </div>
+            
         </main>
 
         <script>  //init
             $(function() {
                 refresh()
             });
-        </script>
-
-        <script> //util funtions
             function refresh(){
                 
                 if (sessionStorage.getItem("login")=="true"){
@@ -184,13 +218,24 @@
                     setTrades();
                 }
                 else{
-                    // islogin="false";
                     sessionStorage.setItem("login","false")
                     $("#mainpage").css('display','none');
-                    $("#login").removeAttr('style');
+                    
+                    if (sessionStorage.getItem("page")=="signup"){
+                        $("#signup").removeAttr('style');
+                        $("#login").css('display','none');
+                    }
+                    else{
+                        $("#signup").css('display','none');
+                        $("#login").removeAttr('style');
+                    }
                 }
             }
 
+        </script>
+       
+        <script> //util funtions
+        
             function postToApi(url,data,successfun=()=>{},failfun=()=>{}){
                 callback=false
                 $.ajax({    
@@ -719,7 +764,9 @@
 
             function login(){
                 jdata={}
-                jdata["name"]=$("#name").val()
+    
+                jdata["email"]=$("#loginEmail").val()
+                jdata["password"]=$("#loginPassword").val()
                 $.ajax({    
                     url: "/user/login",
                     data: JSON.stringify(jdata),
@@ -731,6 +778,7 @@
                             sessionStorage.setItem("login","true")
                             sessionStorage.setItem("user_id",returnData['user_id'])
                             sessionStorage.setItem("user_name",returnData['user_name'])
+                            sessionStorage.setItem("page","main")
                             refresh()
                         }
                         else{
@@ -745,8 +793,10 @@
             }
             function signup(){
                 jdata={}
-                jdata["name"]=$("#name").val()
-                jdata["email"]=$("#email").val()
+                jdata["name"]=$("#signupName").val()
+                jdata["email"]=$("#signupEmail").val()
+                jdata["password"]=$("#signupPassword").val()
+                jdata["confirmPassword"]=$("#signupCpassword").val()
                 $.ajax({    
                     url: "/user/signup",
                     data: JSON.stringify(jdata),
@@ -777,6 +827,7 @@
                         // console.log(returnData);
                         if (returnData['code']==0){
                             sessionStorage.setItem("login","false");
+                            sessionStorage.setItem("page","login")
                             refresh();
                         }
                         else{
@@ -793,7 +844,6 @@
             function deleteUser(){
                 callback=getFromApi("/user/delete")
 
-                
                 if(callback["code"]==0){
                     sessionStorage.clear()
                     alert("User deleted")
@@ -805,6 +855,18 @@
                 }
             }
 
+            function signupPage(){
+                sessionStorage.setItem("page","signup")
+                // refresh()
+                $("#signup").removeAttr('style');
+                $("#login").css('display','none');
+            }
+            function loginPage(){
+                sessionStorage.setItem("page","login")
+                // refresh()
+                $("#signup").css('display','none');
+                $("#login").removeAttr('style');
+            }
         </script>
     </body>
 </html>

@@ -4,15 +4,15 @@ class UsersController < ApplicationController
 
 
     def login
-        @user=User.find_by(name:params[:name])
+        user=User.find_by(email:params[:email])
 
-        if @user
-            session[:user_id] = { value: @user.id, expires: Time.now + 600}
+        if user && user.authenticate(params[:password])
+            session[:user_id] = { value: user.id, expires: Time.now + 600}
 
             render json:{
                 :code=>0,
-                :user_id=>@user[:id],
-                :user_name=>@user[:name]
+                :user_id=>user[:id],
+                :user_name=>user[:name]
             }
         else
             render json:{
@@ -30,42 +30,45 @@ class UsersController < ApplicationController
         }
     end
 
-
-
+# {
+#     "name":"username",
+#     "email":"useremail",
+#     "password":"userpassword",
+#     "confirmPassword":"confirmpassword"
+# }
     def signup
-        @user=User.find_by(email: params[:email])
+        user=User.find_by(email: params[:email])
 
-        if @user
-            render json:{
-                :code=>1,
-                :msg=>"User already exist" 
-            }
-        elsif email && name
-            @user=User.new(name: params[:name],email: params[:email])
+        if user
+            code=1
+            msg="User already exist"
+        elsif params[:password] !=params[:confirmPassword]
+            code=1
+            msg="The password is inconsistent with the confirmation password"
+        elsif params[:email] && params[:name]
+            user=User.new(name: params[:name],email: params[:email],password: params[:password])
 
-            if @user.save
-                render json:{
-                    :code=>0,
-                    :msg=>"success" 
-                }
+            if user.save
+                code=0
+                msg="success" 
             else
-                render json:{
-                    :code=>1,
-                    :msg=>"Fail,pls try again" 
-                }
+                code=>1
+                msg="Fail,pls try again" 
             end
         else
-            render json:{
-                :code=>1,
-                :msg=>"Params error"
-            }
+            code=1
+            msg="Params error"
         end
 
+        render json:{
+            :code=>code,
+            :msg=>msg
+        }
     end
 
     def delete
 
-        if @user.delete_user
+        if @user.delete_user!
             render json:{
                 :code=>0,
                 :msg=>"Success"
