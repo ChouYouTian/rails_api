@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_24_080224) do
+ActiveRecord::Schema.define(version: 2021_12_25_163255) do
 
   create_table "carts", force: :cascade do |t|
     t.integer "amount", default: 1, null: false
@@ -25,6 +25,15 @@ ActiveRecord::Schema.define(version: 2021_12_24_080224) do
     t.integer "product_user_id", default: -1, null: false
   end
 
+  create_table "product_tag_rels", force: :cascade do |t|
+    t.integer "product_id", null: false
+    t.integer "tag_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["product_id"], name: "index_product_tag_rels_on_product_id"
+    t.index ["tag_id"], name: "index_product_tag_rels_on_tag_id"
+  end
+
   create_table "products", force: :cascade do |t|
     t.string "name", null: false
     t.integer "price", default: 0, null: false
@@ -32,6 +41,13 @@ ActiveRecord::Schema.define(version: 2021_12_24_080224) do
     t.integer "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "tags", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
   create_table "trades", force: :cascade do |t|
@@ -52,4 +68,6 @@ ActiveRecord::Schema.define(version: 2021_12_24_080224) do
     t.string "password_digest"
   end
 
+  add_foreign_key "product_tag_rels", "products"
+  add_foreign_key "product_tag_rels", "tags"
 end

@@ -1,7 +1,7 @@
 class Cart < ApplicationRecord
-    belongs_to:user  
-    belongs_to:product
-    belongs_to:trade
+    belongs_to :user  
+    belongs_to :product
+    belongs_to :trade
 
     def intrade!
         self[:state]="intrade"

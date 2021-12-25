@@ -1,6 +1,8 @@
 class Product < ApplicationRecord
-    belongs_to:user
-    has_many:cart
+    belongs_to :user
+    has_many :cart
+    has_many :product_tag_rels
+    has_many :tags ,through: :product_tag_rels
 
 
     def self.get_products_by_userId(id)
