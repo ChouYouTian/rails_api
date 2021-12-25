@@ -79,7 +79,6 @@ class UsersController < ApplicationController
                 :msg=>"fail"
             }
         end
-
     end
 
 

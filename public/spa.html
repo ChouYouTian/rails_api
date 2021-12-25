@@ -15,7 +15,7 @@
             
             <div id="login" class="row  justify-content-center" >
                 <!-- <div class="col"></div> -->
-                <div class="main col col-md-5 col-xl-4  text-center">
+                <div class="main col col-md-5 col-xl-4  text-center" >
                     
                         <h1>Login</h1>
                         <div class="form-floating">
@@ -36,7 +36,7 @@
                 <!-- <div class="col"></div> -->
             </div>
 
-            <div id="signup" class="row justify-content-center" style="display: none;">
+            <div id="signup" class="row justify-content-center" style="display: none;" >
                
                 <div class="main col col-md-5 col-xl-4 text-center">
                     
@@ -209,8 +209,8 @@
             function refresh(){
                 
                 if (sessionStorage.getItem("login")=="true"){
-                    $("#login").css('display','none');
-                    $("#mainpage").removeAttr('style');
+                    $("#login").hide()
+                    $("#mainpage").show()
                     $('#hello').text('Hello '+sessionStorage.getItem("user_name"))
                     myproducts();
                     setProviders();
@@ -219,15 +219,16 @@
                 }
                 else{
                     sessionStorage.setItem("login","false")
-                    $("#mainpage").css('display','none');
+                    $("#mainpage").hide()
                     
                     if (sessionStorage.getItem("page")=="signup"){
-                        $("#signup").removeAttr('style');
-                        $("#login").css('display','none');
+                        $("#login").hide();
+                        $("#signup").show();
                     }
                     else{
-                        $("#signup").css('display','none');
-                        $("#login").removeAttr('style');
+                        $("#signup").hide();
+                        $("#login").show();
+
                     }
                 }
             }
@@ -253,7 +254,7 @@
                         else if (returnData['code']==8){
                             sessionStorage.setItem("login","false");
                             alert(returnData['msg']);
-                            refresh()
+                            // refresh()
                         }
                         else{
                             alert(returnData['msg']);
@@ -282,7 +283,7 @@
                         else if (returnData['code']==8){
                             sessionStorage.setItem("login","false");
                             alert(returnData['msg']);
-                            refresh()
+                            // refresh()
                         }
                         else{
                             alert(returnData['msg']);
@@ -779,6 +780,7 @@
                             sessionStorage.setItem("user_id",returnData['user_id'])
                             sessionStorage.setItem("user_name",returnData['user_name'])
                             sessionStorage.setItem("page","main")
+                            
                             refresh()
                         }
                         else{
@@ -828,6 +830,7 @@
                         if (returnData['code']==0){
                             sessionStorage.setItem("login","false");
                             sessionStorage.setItem("page","login")
+                            
                             refresh();
                         }
                         else{
@@ -847,6 +850,7 @@
                 if(callback["code"]==0){
                     sessionStorage.clear()
                     alert("User deleted")
+                    
                     refresh()
 
                 }
@@ -857,15 +861,13 @@
 
             function signupPage(){
                 sessionStorage.setItem("page","signup")
-                // refresh()
-                $("#signup").removeAttr('style');
-                $("#login").css('display','none');
+      
+                refresh()
             }
             function loginPage(){
                 sessionStorage.setItem("page","login")
-                // refresh()
-                $("#signup").css('display','none');
-                $("#login").removeAttr('style');
+            
+                refresh()
             }
         </script>
     </body>
