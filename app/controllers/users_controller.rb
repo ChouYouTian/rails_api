@@ -7,7 +7,7 @@ class UsersController < ApplicationController
         user=User.find_by(email:params[:email])
 
         if user && user.authenticate(params[:password])
-            session[:user_id] = { value: user.id, expires: Time.now + 600}
+            session[:user_id] = { value: user.id, expires: Time.now + 1.hours}
 
             render json:{
                 :code=>0,

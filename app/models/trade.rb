@@ -1,7 +1,6 @@
 class Trade < ApplicationRecord
-    belongs_to:user
-
-    has_many:carts
+    belongs_to :user
+    has_many :carts
 
     def fail!
         self[:state]='fail'

@@ -1,5 +1,5 @@
 class ProductController < ApplicationController
-    before_action :autenticate_spa_user! ,only: [:addProducts,:updateProducts,:deleteProducts]
+    before_action :autenticate_spa_user! ,except: [:getProviders,:getProducts]
 
     def getProviders
         plist=User.get_provider
@@ -23,7 +23,7 @@ class ProductController < ApplicationController
     #      ]
     #  }
     def getProducts
-        products_info=Product.get_products_by_userId(params[:id])
+        products_info=Product.get_productsInfo_by_userId(params[:id])
 
         render json:{
             :code=>0,
@@ -73,7 +73,6 @@ class ProductController < ApplicationController
 
     #-----updateProducts input example----
     # {
-    #     "name":"test", #user name
     #     "products":[
     #                  {
     #                    "id":1 #product id
@@ -142,5 +141,58 @@ class ProductController < ApplicationController
             }
         end
     end
+
+
+    #-----addTag input example----
+    # {
+    #     "product":1, #product id 
+    #     "tag":"tagname1"
+    # }
+    def addTag
+        code=0
+        msg=''
+        product=@user.products.find(params[:product])
+        tag=Tag.find_by(name: params[:tag])
+        unless tag
+            tag=Tag.new(name: params[:tag])    
+        end
+
+        unless product.tags.include? tag
+            product.tags<<tag
+        else
+            code=1
+            msg='already exist'
+        end
+
+        render json:{
+            :code=>code,
+            :msg=>msg
+        }
+    end
+
+    #-----deleteTag input example----
+    # {
+    #     "product":1, #product id 
+    #     "tag":"tagname"
+    # }
+    def deleteTag
+        product=@user.products.find(params[:product])
+        tag=product.tags.find_by(name: params[:tag])
+        if tag
+            product.tags.destroy(tag)
+            code=0
+            msg=""
+        else
+            code=1
+            msg="tag not found"
+        end
+
+        render json:{
+            :code=>code,
+            :msg=>msg
+        }
+    end
+
+    
 
 end

@@ -36,6 +36,7 @@
                 <!-- <div class="col"></div> -->
             </div>
 
+            
             <div id="signup" class="row justify-content-center" style="display: none;" >
                
                 <div class="main col col-md-5 col-xl-4 text-center">
@@ -67,10 +68,6 @@
               
             </div>
 
-            
-
-
-
 
             <div id="mainpage" class="" style="display: none;">
                 <div class="row  justify-content-center">
@@ -89,6 +86,9 @@
                                 <th>Product name</th>
                                 <th>price</th>
                                 <th>quentity</th>
+                                <th></th>
+                                <th>tags</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -126,9 +126,10 @@
                         <thead>
                             <tr>
                                 <th>Product name</th>
-                                <th>quentity</th>
-                                <th>price</th>
-                                <th>amount</th>
+                                <th>Quentity</th>
+                                <th>Price</th>
+                                <th>Amount</th>
+                                <th>Tags</th>
                                 <th> </th>
                                 <!-- <th></th> -->
                             </tr>
@@ -137,7 +138,6 @@
                             
                         </tbody>
                     </table>
-                    
                 </div>
 
 
@@ -199,6 +199,36 @@
             
             
             </div>
+
+            <!-- The Modal -->
+            <div class="modal" id="tagModal">
+                <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+            
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                    <h4 class="modal-title">Modal Heading</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+            
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="form-floating">
+                            <input type="text" id="modalInput" class="form-control" placeholder="tag">
+                            <label for="modalInput">Add Tag</label>
+                        </div>
+                        <p>ex. Cookies</p>
+                    </div>
+            
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button id="modalAdd" class="btn btn-primary" data-bs-dismiss="modal" onclick="addTag(this)">Add</button>
+                        <button id="modalDelete" class="btn btn-danger" data-bs-dismiss="modal" onclick="deleteTag(this)">Delete</button>
+                    </div>
+            
+                </div>
+                </div>
+            </div>
             
         </main>
 
@@ -254,7 +284,7 @@
                         else if (returnData['code']==8){
                             sessionStorage.setItem("login","false");
                             alert(returnData['msg']);
-                            // refresh()
+                            refresh()
                         }
                         else{
                             alert(returnData['msg']);
@@ -283,7 +313,7 @@
                         else if (returnData['code']==8){
                             sessionStorage.setItem("login","false");
                             alert(returnData['msg']);
-                            // refresh()
+                            refresh()
                         }
                         else{
                             alert(returnData['msg']);
@@ -321,8 +351,33 @@
                 return products
             }
         </script>
+        <script> //modal
+            var tagModal = document.getElementById('tagModal')
+            var productId 
+            tagModal.addEventListener('show.bs.modal', function (event) {
+      
+            var button = event.relatedTarget
+            var parent=button.parentNode.parentNode
+            productId=parent.querySelector('td[name="id"]').dataset.id
+            // console.log(productId)
+            $("#modalAdd").attr("data-id",productId)
+            $("#modalDelete").attr("data-id",productId)
 
+            })
+        </script>
+        <script> //tags
+            function addTag(element){
+                tag=$("#modalInput").val()
+                productId=element.dataset.id
+                postToApi("/product/addTag",{"product":productId,"tag":tag},()=>{myproducts()})
+            }
 
+            function deleteTag(element){
+                tag=$("#modalInput").val()
+                productId=element.dataset.id
+                postToApi("/product/deleteTag",{"product":productId,"tag":tag},()=>{myproducts()})
+            }
+        </script>
         <script> //product funtions
             function myproducts(){
                 products=getProducts(sessionStorage.getItem('user_id'))
@@ -331,25 +386,35 @@
                     })
                 var table = document.getElementById("myproducttable").querySelector('tbody');
 
-                products.forEach(element => {
+                products.forEach(product => {
                     var row = table.insertRow(-1);
                     var deletebtn = row.insertCell(0);
                     var name = row.insertCell(1);
                     var price = row.insertCell(2);
                     var quentity = row.insertCell(3);
                     var btns = row.insertCell(4);
-                    var id = row.insertCell(5);
+                    var tags=row.insertCell(5);
+                    var tagbtn = row.insertCell(6);
+                    var id = row.insertCell(7);
 
-                    name.innerHTML = '<input type="text" name="name" readonly value='+ element['name']+ '>';
-                    price.innerHTML = '<input type="number" name="price" min="0" max="5000" readonly value='+element['price'] +'>';
-                    quentity.innerHTML = '<input type="number" name="quantity" min="0" max="500" readonly value='+element['quentity'] +'>';
+                    name.innerHTML = '<input type="text" name="name" readonly value='+ product['name']+ '>';
+                    price.innerHTML = '<input type="number" name="price" min="0" max="5000" readonly value='+product['price'] +'>';
+                    quentity.innerHTML = '<input type="number" name="quantity" min="0" max="500" readonly value='+product['quentity'] +'>';
+
+                    tagsStr=""
+                    product['tags'].forEach(tag=>{
+                        tagsStr+="#"+tag["name"]+" "
+                    })
+                    tags.innerHTML=tagsStr
+
+                    tagbtn.innerHTML='<button  class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#tagModal">Edit tag</button>'
 
                     deletebtn.innerHTML = '<button name="delete" class="btn btn-danger" onclick="deleteProduct(this)">delete</button>'
                     btns.innerHTML = '<button name="save" class="btn btn-secondary" onclick="saveProduct(this)" disabled >save</button>'+'<button name="edit" class="btn btn-primary"  onclick="editProduct(this)" >edit</button>'
                  
                     $(id).hide();
                     $(id).attr('name','id')
-                    $(id).attr('data-id',element['id'])
+                    $(id).attr('data-id',product['id'])
                     $(id).attr('data-edit','false')
                     
                 });
@@ -616,26 +681,33 @@
                 })
                 var table = document.getElementById("producttable").querySelector('tbody');
 
-                products.forEach(element => {
+                products.forEach(product => {
                     var row = table.insertRow(-1);
        
                     var name = row.insertCell(0);
                     var quentity = row.insertCell(1);
                     var price = row.insertCell(2);
                     var amount = row.insertCell(3);
-                    var addbtn = row.insertCell(4);
-                    var id = row.insertCell(5);
+                    var tags = row.insertCell(4);
+                    var addbtn = row.insertCell(5);
+                    var id = row.insertCell(6);
 
-                    name.innerHTML = element['name'];
-                    quentity.innerHTML = element['quentity'];
-                    price.innerHTML = element['price'];
-                    amount.innerHTML='<input type="number" name="amount" min="0" max='+element['quentity']+' value=0>';
+                    name.innerHTML = product['name'];
+                    quentity.innerHTML = product['quentity'];
+                    price.innerHTML = product['price'];
+                    amount.innerHTML='<input type="number" name="amount" min="0" max='+product['quentity']+' value=0>';
+
+                    tagsStr=""
+                    product['tags'].forEach(tag=>{
+                        tagsStr+="#"+tag["name"]+" "
+                    })
+                    tags.innerHTML=tagsStr
 
                     addbtn.innerHTML = '<button name="addToCart" class="btn btn-primary" onclick="addToCart(this)">add to cart</button>'
                  
                     $(id).hide();
                     $(id).attr('name','id')
-                    $(id).attr('data-id',element['id'])
+                    $(id).attr('data-id',product['id'])
                     $(id).attr('data-edit','false')
                     
                 });
