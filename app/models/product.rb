@@ -5,10 +5,10 @@ class Product < ApplicationRecord
     has_many :tags ,through: :product_tag_rels
 
 
-    def self.get_products_by_userId(id)
-        products=Product.where(user_id: id)
+    def self.get_productsInfo_by_userId(id)
+        products=Product.eager_load(:tags).where(user_id: id)
 
-        return products.map {|p| p.as_json(:except=>[:created_at,:updated_at])}
+        return products.map {|p| p.as_json(include: {tags:{only: :name}},except: [:created_at,:updated_at])}
     end
 
     

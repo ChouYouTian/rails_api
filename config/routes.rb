@@ -14,6 +14,9 @@ Rails.application.routes.draw do
   post "product/addProducts"=>"product#addProducts"
   post "product/updateProducts"=>"product#updateProducts"
   post "product/deleteProducts"=>"product#deleteProducts"
+  post "product/addTag"=>"product#addTag"
+  post "product/deleteTag"=>"product#deleteTag"
+  
 
   get "cart"=>"cart#myCart"
   post "cart/addToCart"=>"cart#addToCart"
