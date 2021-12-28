@@ -5,6 +5,38 @@ class Product < ApplicationRecord
     has_many :tags ,through: :product_tag_rels
 
 
+    def add_tag(tagName)
+        code=0
+        msg=""
+        tag=Tag.find_by(name: tagName)
+        unless tag
+            tag=Tag.new(name: tagName)    
+        end
+
+        unless self.tags.include? tag
+            self.tags<<tag
+        else
+            code=1
+            msg='already exist'
+        end
+
+        return code,msg
+    end
+
+    def delete_tag(tagName)
+        tag=self.tags.find_by(name: tagName)
+        if tag
+            self.tags.destroy(tag)
+            code=0
+            msg=""
+        else
+            code=1
+            msg="tag not found"
+        end
+        return code,msg
+    end
+
+
     def self.get_productsInfo_by_userId(id)
         products=Product.eager_load(:tags).where(user_id: id)
 

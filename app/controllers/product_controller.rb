@@ -116,30 +116,19 @@ class ProductController < ApplicationController
     #     "products":[1...] #product id (int)
     # }
     def deleteProducts
-
         products=params[:products]
 
         if products
-
             code,msg=Product.delete_products @user,products
-
-            if code==0
-                render json:{
-                    :code=>code,
-                    :msg=>"products deleted"
-                }
-            else
-                render json:{
-                    :code=>code,
-                    :msg=>"#{msg}"
-                }
-            end
         else
-            render json:{
-                :code=>1,
-                :msg=>"Did not find products,pls check your params"
-            }
+            code=1
+            msg="Did not find products,pls check your params"
         end
+
+        render json:{
+            :code=>cdoe,
+            :msg=>msg
+        }
     end
 
 
@@ -149,20 +138,10 @@ class ProductController < ApplicationController
     #     "tag":"tagname1"
     # }
     def addTag
-        code=0
-        msg=''
-        product=@user.products.find(params[:product])
-        tag=Tag.find_by(name: params[:tag])
-        unless tag
-            tag=Tag.new(name: params[:tag])    
-        end
 
-        unless product.tags.include? tag
-            product.tags<<tag
-        else
-            code=1
-            msg='already exist'
-        end
+        product=@user.products.find(params[:product])
+        
+        code,msg=product.add_tag(params[:tag])
 
         render json:{
             :code=>code,
@@ -177,22 +156,13 @@ class ProductController < ApplicationController
     # }
     def deleteTag
         product=@user.products.find(params[:product])
-        tag=product.tags.find_by(name: params[:tag])
-        if tag
-            product.tags.destroy(tag)
-            code=0
-            msg=""
-        else
-            code=1
-            msg="tag not found"
-        end
+
+        code,msg=product.delete_tag(params[:tag])
 
         render json:{
             :code=>code,
             :msg=>msg
         }
     end
-
-    
 
 end
