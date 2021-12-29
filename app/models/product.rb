@@ -1,8 +1,8 @@
 class Product < ApplicationRecord
     belongs_to :user
     has_many :cart
-    has_many :product_tag_rels
-    has_many :tags ,through: :product_tag_rels
+    has_many :products_tags_rels
+    has_many :tags ,through: :products_tags_rels
 
 
     def add_tag(tagName)

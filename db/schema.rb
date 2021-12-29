@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_25_163255) do
+ActiveRecord::Schema.define(version: 2021_12_29_142032) do
 
   create_table "carts", force: :cascade do |t|
     t.integer "amount", default: 1, null: false
@@ -25,13 +25,21 @@ ActiveRecord::Schema.define(version: 2021_12_25_163255) do
     t.integer "product_user_id", default: -1, null: false
   end
 
-  create_table "product_tag_rels", force: :cascade do |t|
-    t.integer "product_id", null: false
-    t.integer "tag_id", null: false
+  create_table "coupons", force: :cascade do |t|
+    t.integer "user_id"
+    t.string "name", limit: 10, null: false
+    t.string "user_type", default: "user", null: false
+    t.integer "amount", default: 0, null: false
+    t.string "discount_type", default: "price", null: false
+    t.integer "discount_amount", default: 0, null: false
+    t.integer "discount_ordinal", default: 0, null: false
+    t.date "start", null: false
+    t.date "end", null: false
+    t.string "state", default: "disable", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["product_id"], name: "index_product_tag_rels_on_product_id"
-    t.index ["tag_id"], name: "index_product_tag_rels_on_tag_id"
+    t.index ["name"], name: "index_coupons_on_name"
+    t.index ["user_id"], name: "index_coupons_on_user_id"
   end
 
   create_table "products", force: :cascade do |t|
@@ -41,6 +49,15 @@ ActiveRecord::Schema.define(version: 2021_12_25_163255) do
     t.integer "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "products_tags_rels", force: :cascade do |t|
+    t.integer "product_id", null: false
+    t.integer "tag_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["product_id"], name: "index_products_tags_rels_on_product_id"
+    t.index ["tag_id"], name: "index_products_tags_rels_on_tag_id"
   end
 
   create_table "tags", force: :cascade do |t|
@@ -68,6 +85,14 @@ ActiveRecord::Schema.define(version: 2021_12_25_163255) do
     t.string "password_digest"
   end
 
-  add_foreign_key "product_tag_rels", "products"
-  add_foreign_key "product_tag_rels", "tags"
+  create_table "users_coupons_rels", id: false, force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "coupon_id"
+    t.integer "amount", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["coupon_id"], name: "index_users_coupons_rels_on_coupon_id"
+    t.index ["user_id"], name: "index_users_coupons_rels_on_user_id"
+  end
+
 end
