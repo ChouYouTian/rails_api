@@ -1,8 +1,11 @@
 class Product < ApplicationRecord
     belongs_to :user
-    has_many :cart
+    has_many :carts
     has_many :products_tags_rels
     has_many :tags ,through: :products_tags_rels
+
+    has_many :coupons_products_tags_rels,as: :object
+
 
 
     def add_tag(tagName)
