@@ -23,7 +23,7 @@ class User < ApplicationRecord
         end
     end
 
-    def self.get_provider
+    def self.get_providers
         providers=User.all
         plist=[]
 
@@ -32,6 +32,7 @@ class User < ApplicationRecord
         end
         return plist
     end
+    
 
 
 end

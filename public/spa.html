@@ -82,10 +82,11 @@
                     <h4>My product</h4>
                     <table id="myproducttable" class="table table-hover">
                         <thead>
-                            <tr><th></th>
+                            <tr>
+                                <th></th>
                                 <th>Product name</th>
                                 <th>price</th>
-                                <th>quentity</th>
+                                <th>quantity</th>
                                 <th></th>
                                 <th>tags</th>
                                 <th></th>
@@ -107,12 +108,67 @@
                             <span class="input-group-text ">Price</span>
                             <input type="number" name="price" min="0" max="500" class="form-control ">
                             
-                            <span class="input-group-text ">Quentity</span>
-                            <input type="number"  name="quentity" min="0" max="500" class="form-control">
+                            <span class="input-group-text ">Quantity</span>
+                            <input type="number"  name="quantity" min="0" max="500" class="form-control">
                             
                             <button class="btn btn-primary" onclick="createProduct(this)">create</button>
                         </div>
                     </div>
+                </div>
+
+                <!-- coupons -->
+                <div class="container my-5 py-3 border rounded-3">
+                    <h4>Coupons</h4>
+                    <table id="coupontable" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>id</th>
+                                <th>name</th>
+                                <th>quantity</th>
+                                <th>description</th>
+                                <th>start</th>
+                                <th>end</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <button onclick="$('#newCoupon').toggle(100)">create coupon</button>
+                    <div class="mt-3" id="newCoupon" >
+                        <form action="/coupon/test" method="post">
+
+                            <div class="input-group mb-3">
+                                <input name="name" type="text" class="form-control" placeholder="Coupon name ex.NewYear30">
+                                <button class="btn btn-outline-danger" type="button">Check name</button>
+                            </div>
+                            <select name="type" class="form-select form-select-lg mb-3">
+                                <option selected>Select type</option>
+                                <option value="price">Price</option>
+                                <option value="percentage">Percentage</option>
+                            </select>
+                            <input name="quantity" class="form-control mb-3" type="number" min=0 placeholder="Quantity">
+                            <input name="description" class="form-control mb-3" type="text" placeholder="Description">
+                            <input name="minmum" class="form-control mb-3" type="number" min=0 placeholder="Minmum">
+                            <input name="ordinal" class="form-control mb-3" type="number" min=0 placeholder="Ordinal">
+                            <input name="amount" class="form-control mb-3" type="number" min=0 max=100 placeholder="Discount Amount">
+                            
+                            <fieldset class="border p-2 mb-3">
+                                <legend class="w-auto">Conditions:</legend>
+                                <div class="input-group mb-3">
+                                    <input id="selectedProducts" class="form-control" type="text" placeholder="ProductID">
+                                    <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#productModal">Find products</button>
+                                </div>
+                                <label class="mb-3">Or</label>
+                                <input name="tags" class="form-control mb-3" type="text" placeholder="Tag">
+                            </fieldset>
+
+
+                            <input name="start_time" class="form-control mb-3" type="datetime-local" >
+                            <input name="end_time" class="form-control" type="datetime-local" >
+                            <input type="submit" value="Create"> 
+                            
+                        </form>
+                    </div>
+                    
                 </div>
                     
                 <!-- products -->
@@ -126,7 +182,7 @@
                         <thead>
                             <tr>
                                 <th>Product name</th>
-                                <th>Quentity</th>
+                                <th>Quantity</th>
                                 <th>Price</th>
                                 <th>Amount</th>
                                 <th>Tags</th>
@@ -151,7 +207,7 @@
                                 <th>Product name</th>
                                 <th>amount</th>
                                 <th>price</th>
-                                <th>quentity</th>
+                                <th>quantity</th>
                                 <th>total price</th>
                                 <th> </th>
                                 <th>message</th>
@@ -200,33 +256,72 @@
             
             </div>
 
-            <!-- The Modal -->
+            <!-- Tag Modal -->
             <div class="modal" id="tagModal">
                 <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-            
-                    <!-- Modal Header -->
-                    <div class="modal-header">
-                    <h4 class="modal-title">Modal Heading</h4>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-            
-                    <!-- Modal body -->
-                    <div class="modal-body">
-                        <div class="form-floating">
-                            <input type="text" id="modalInput" class="form-control" placeholder="tag">
-                            <label for="modalInput">Add Tag</label>
+                    <div class="modal-content">
+                
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                        <h4 class="modal-title">Modal Heading</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
-                        <p>ex. Cookies</p>
+                
+                        <!-- Modal body -->
+                        <div class="modal-body">
+                            <div class="form-floating">
+                                <input type="text" id="modalInput" class="form-control" placeholder="tag">
+                                <label for="modalInput">Add Tag</label>
+                            </div>
+                            <p>ex. Cookies</p>
+                        </div>
+                
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button id="modalAdd" class="btn btn-primary" data-bs-dismiss="modal" onclick="addTag(this)">Add</button>
+                            <button id="modalDelete" class="btn btn-danger" data-bs-dismiss="modal" onclick="deleteTag(this)">Delete</button>
+                        </div>
+                
                     </div>
-            
-                    <!-- Modal footer -->
-                    <div class="modal-footer">
-                        <button id="modalAdd" class="btn btn-primary" data-bs-dismiss="modal" onclick="addTag(this)">Add</button>
-                        <button id="modalDelete" class="btn btn-danger" data-bs-dismiss="modal" onclick="deleteTag(this)">Delete</button>
-                    </div>
-            
                 </div>
+            </div>
+
+            <!-- Product Modal -->
+            <div class="modal" id="productModal">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                        <h4 class="modal-title">Select Products</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                
+                        <!-- Modal body -->
+                        <div class="modal-body" id="selectProduct">
+                            <table class="table table-hover " >
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Price</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    
+                                </tbody>
+                            </table>
+
+                        </div>
+                
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                            <button  class="btn btn-primary" data-bs-dismiss="modal" onclick="selectCouponProducts()">Select</button>
+                        </div>
+                
+                    </div>
                 </div>
             </div>
             
@@ -353,15 +448,56 @@
         </script>
         <script> //modal
             var tagModal = document.getElementById('tagModal')
-            var productId 
+            
             tagModal.addEventListener('show.bs.modal', function (event) {
       
-            var button = event.relatedTarget
-            var parent=button.parentNode.parentNode
-            productId=parent.querySelector('td[name="id"]').dataset.id
-            // console.log(productId)
-            $("#modalAdd").attr("data-id",productId)
-            $("#modalDelete").attr("data-id",productId)
+                var button = event.relatedTarget
+                var parent=button.parentNode.parentNode
+                productId=parent.querySelector('td[name="id"]').dataset.id
+
+                $("#modalAdd").attr("data-id",productId)
+                $("#modalDelete").attr("data-id",productId)
+
+            })
+
+            var productModal = document.getElementById('productModal')
+
+            productModal.addEventListener('show.bs.modal', function (event) {
+                products=getProducts(sessionStorage.getItem('user_id'))
+                table = document.getElementById("productModal").querySelector('tbody');
+                $('#productModal tbody tr').each(function(){
+                    $(this).remove()
+                })
+
+                ids=$('#selectedProducts').val().split( /\s*/)
+                console.log(ids)
+                
+
+                products.forEach(product=>{
+                    var row = table.insertRow(-1);
+                    var selectbtn = row.insertCell(0);
+                    var ID = row.insertCell(1);
+                    var name = row.insertCell(2);
+                    var price = row.insertCell(3);
+                    var quantity = row.insertCell(4);
+
+                    var checkbox= document.createElement("input");
+                    checkbox.type='checkbox'
+                    checkbox.setAttribute('data-id',product['id'])
+                    if (ids.includes(product['id'].toString())){
+                        checkbox.checked=true
+                    }
+                    
+                    selectbtn.appendChild(checkbox)
+                    
+                    ID.innerHTML=product["id"]
+                    name.innerHTML=product['name']
+                    price.innerHTML=product['price']
+                    quantity.innerHTML=product['quantity']
+
+                })
+                
+                
 
             })
         </script>
@@ -391,7 +527,7 @@
                     var deletebtn = row.insertCell(0);
                     var name = row.insertCell(1);
                     var price = row.insertCell(2);
-                    var quentity = row.insertCell(3);
+                    var quantity = row.insertCell(3);
                     var btns = row.insertCell(4);
                     var tags=row.insertCell(5);
                     var tagbtn = row.insertCell(6);
@@ -399,7 +535,7 @@
 
                     name.innerHTML = '<input type="text" name="name" readonly value='+ product['name']+ '>';
                     price.innerHTML = '<input type="number" name="price" min="0" max="5000" readonly value='+product['price'] +'>';
-                    quentity.innerHTML = '<input type="number" name="quantity" min="0" max="500" readonly value='+product['quentity'] +'>';
+                    quantity.innerHTML = '<input type="number" name="quantity" min="0" max="500" readonly value='+product['quantity'] +'>';
 
                     tagsStr=""
                     product['tags'].forEach(tag=>{
@@ -423,21 +559,21 @@
             function getSibling(element){
                 parent=element.parentNode.parentNode
                 pname=parent.querySelector('input[name="name"]') //pname product name
-                quentity= parent.querySelector('input[name="quantity"]')
+                quantity= parent.querySelector('input[name="quantity"]')
                 price=parent.querySelector('input[name="price"]')
                 id=parent.querySelector('td[name="id"]')
-                return [pname,quentity,price,id]
+                return [pname,quantity,price,id]
             }
 
             function saveProduct(element){
 
-                [pname,quentity,price,id]=getSibling(element) //pname product name
+                [pname,quantity,price,id]=getSibling(element) //pname product name
                 editbtn=element.nextElementSibling;
 
                 product={}
                 product["id"]=id.dataset.id
                 product["name"]=pname.value
-                product["quentity"]=quentity.value
+                product["quantity"]=quantity.value
                 product["price"]=price.value
 
                 postToApi( "/product/updateProducts",{'products':[product]},
@@ -447,7 +583,7 @@
                     element.disabled=true
 
                     pname.readOnly=true
-                    quentity.readOnly=true
+                    quantity.readOnly=true
                     price.readOnly=true
                 },
                 ()=>{
@@ -457,14 +593,14 @@
             }
 
             function editProduct(element){
-                [pname,quentity,price,id]=getSibling(element) //pname product name
+                [pname,quantity,price,id]=getSibling(element) //pname product name
                 savebtn=element.previousElementSibling;
 
                 savebtn.disabled=false
                 element.disabled=true
 
                 pname.readOnly=false
-                quentity.readOnly=false
+                quantity.readOnly=false
                 price.readOnly=false
             }
 
@@ -473,12 +609,12 @@
                 parent=element.parentNode
                 pname=parent.querySelector('input[name="name"]') //product name
                 price=parent.querySelector('input[name="price"]')
-                quentity=parent.querySelector('input[name="quentity"]')
+                quantity=parent.querySelector('input[name="quantity"]')
 
                 jdata={}
                 product={}
                 product["name"]=pname.value
-                product["quentity"]=quentity.value 
+                product["quantity"]=quantity.value 
                 product["price"]=price.value
 
                 jdata['products']=[product]
@@ -488,7 +624,7 @@
                     alert("Saved");
                     myproducts();
                     pname.value="";
-                    quentity.value =0;
+                    quantity.value =0;
                     price.value=0;
                 })
 
@@ -499,7 +635,7 @@
             function deleteProduct(element){
 
                 
-                [pname,quentity,price,id]=getSibling(element)
+                [pname,quantity,price,id]=getSibling(element)
 
                 if (confirm("Sure to delete "+pname.value+"?")){
                     jdata={"products":[id.dataset.id]}
@@ -532,7 +668,7 @@
                     var name = row.insertCell(1);
                     var amount = row.insertCell(2);
                     var price = row.insertCell(3);
-                    var quentity = row.insertCell(4);
+                    var quantity = row.insertCell(4);
                     var total_price = row.insertCell(5);
                     var deletebtn = row.insertCell(6);
                     var msg = row.insertCell(7);
@@ -543,8 +679,8 @@
                     amount.innerHTML ='<input type="number" name="amount" onchange="changeCartAmount(this)" min="1"'+' value='+cart['amount'] + '>';;
                     price.innerHTML = cart['price'];
                     price.setAttribute('name','price')
-                    quentity.innerHTML = cart['quentity'];
-                    quentity.setAttribute('name','quentity')
+                    quantity.innerHTML = cart['quantity'];
+                    quantity.setAttribute('name','quantity')
                     total_price.innerHTML=cart['total_price']
                     total_price.setAttribute('name','total_price')
                     deletebtn.innerHTML= '<button class="btn btn-danger" onclick="deleteCart(this)">delete</button>'
@@ -612,13 +748,13 @@
                 price=parent.querySelector('td[name="price"]')
                 total_price=parent.querySelector('td[name="total_price"]')
                 select=parent.querySelector('input[name="select"]')
-                quentity=parent.querySelector('td[name="quentity"]')
+                quantity=parent.querySelector('td[name="quantity"]')
                 msg=parent.querySelector('td[name="msg"]')
-                if(element.value<=parseInt(quentity.innerHTML)){
+                if(element.value<=parseInt(quantity.innerHTML)){
                     select.removeAttribute('disabled')
                     msg.innerHTML=""
                 }
-                else if(element.value>parseInt(quentity.innerHTML)){
+                else if(element.value>parseInt(quantity.innerHTML)){
                     select.disabled=true
                     msg.innerHTML="數量不足"
                     
@@ -685,7 +821,7 @@
                     var row = table.insertRow(-1);
        
                     var name = row.insertCell(0);
-                    var quentity = row.insertCell(1);
+                    var quantity = row.insertCell(1);
                     var price = row.insertCell(2);
                     var amount = row.insertCell(3);
                     var tags = row.insertCell(4);
@@ -693,9 +829,9 @@
                     var id = row.insertCell(6);
 
                     name.innerHTML = product['name'];
-                    quentity.innerHTML = product['quentity'];
+                    quantity.innerHTML = product['quantity'];
                     price.innerHTML = product['price'];
-                    amount.innerHTML='<input type="number" name="amount" min="0" max='+product['quentity']+' value=0>';
+                    amount.innerHTML='<input type="number" name="amount" min="0" max='+product['quantity']+' value=0>';
 
                     tagsStr=""
                     product['tags'].forEach(tag=>{
@@ -831,6 +967,63 @@
                 $(w.document.body).html(html);
             }
         
+        </script>
+
+        <script> //coupon funtions
+
+            function setCoupons(){
+                $("#couponstable tbody tr").each(function(){
+                    $(this).remove()
+                })
+                table = document.getElementById("coupontable").querySelector('tbody');
+                
+                coupons=getFromApi('coupon')['coupons']
+
+                coupons.forEach(coupon=>{
+                    var row = table.insertRow(-1);
+                    
+                    var id = row.insertCell(0);
+                    var name = row.insertCell(1);
+                    var quantity = row.insertCell(2);
+                    var description = row.insertCell(3);
+                    var start = row.insertCell(4);
+                    var end = row.insertCell(5);
+
+                    id.innerHTML=coupon['id']
+                    name.innerHTML=coupon['name']
+                    quantity.innerHTML=coupon['quantity']
+                    description.innerHTML=coupon['description']
+                    start.innerHTML=coupon['start_time']
+                    end.innerHTML=coupon['end_time']
+                })
+            }
+
+            function createCoupon(){
+                couponname=$('#newCoupon input[name="name"]').val()
+
+
+
+                console.log()
+
+     
+
+
+            }
+
+            function selectCouponProducts(){
+                var ids=""
+                $('#productModal tbody tr input').each(function(){
+
+                    if(this.checked){
+                        ids+=this.dataset.id+" "
+                    }
+                    
+                })
+
+                $('#selectedProducts').val(ids)
+
+            }
+
         </script>
         
         <script>  //user funtions

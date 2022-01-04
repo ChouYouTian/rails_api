@@ -2,7 +2,7 @@ class ProductController < ApplicationController
     before_action :autenticate_spa_user! ,except: [:getProviders,:getProducts]
 
     def getProviders
-        plist=User.get_provider
+        plist=User.get_providers
 
         render json:{
             :code=>0,
@@ -17,7 +17,7 @@ class ProductController < ApplicationController
     #              "id":1,
     #              "name":'productname',
     #              "price":20,
-    #              "quentity":100
+    #              "quantity":100
     #          },
     #          {...}
     #      ]
@@ -37,7 +37,7 @@ class ProductController < ApplicationController
     #         {
     #             "name":"testproduct", #product name
     #             --"price":20,          #product price default 0
-    #             --"quentity":20        #product quentity default 0
+    #             --"quantity":20        #product quantity default 0
     #         },
     #         {
     #           ...
@@ -78,7 +78,7 @@ class ProductController < ApplicationController
     #                    "id":1 #product id
     #                    --"name":"new productname", #new product name
     #                    --"price":20,          #new product price 
-    #                    --"quentity":20        #new product quentity 
+    #                    --"quantity":20        #new product quantity 
     #                   },
     #         {
     #           ...

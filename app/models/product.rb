@@ -80,8 +80,8 @@ class Product < ApplicationRecord
                 myproduct[:price]=hashPorducts[id][:price]
             end
 
-            if hashPorducts[id][:quentity]
-                myproduct[:quentity]=hashPorducts[id][:quentity]
+            if hashPorducts[id][:quantity]
+                myproduct[:quantity]=hashPorducts[id][:quantity]
             end
             myproduct.save
 
@@ -115,13 +115,13 @@ class Product < ApplicationRecord
             np=Product.new(name: p[:name]) #new product
 
             price=p[:price]
-            quentity=p[:quentity]
+            quantity=p[:quantity]
 
             if price
                 np[:price]=price
             end
-            if quentity
-                np[:quentity]=quentity
+            if quantity
+                np[:quantity]=quantity
             end
 
             newProducts<<np

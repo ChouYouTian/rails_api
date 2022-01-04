@@ -10,7 +10,7 @@ class CheckTradeJob < ApplicationJob
         product=cart.product
 
         if product
-          product[:quentity]+=cart[:amount]
+          product[:quantity]+=cart[:amount]
           product.save
         end
 

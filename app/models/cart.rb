@@ -30,7 +30,7 @@ class Cart < ApplicationRecord
 
         if product &&(self[:product_user_id]==product[:user_id]) #檢查product的user id是否相同，避免product刪除後id重複
 
-            if self[:amount]>product[:quentity]
+            if self[:amount]>product[:quantity]
                 if self[:state]=="active"
                     self[:msg]="數量不足"
                     self[:state]="lack"
@@ -48,7 +48,7 @@ class Cart < ApplicationRecord
                 save=true
             end
 
-            selfinfo={:id=>self[:id],:amount=>self[:amount],:total_price=>self[:total_price],:state=>self[:state],:msg=>self[:msg],:name=>product[:name],:price=>product[:price],:quentity=>product[:quentity]}
+            selfinfo={:id=>self[:id],:amount=>self[:amount],:total_price=>self[:total_price],:state=>self[:state],:msg=>self[:msg],:name=>product[:name],:price=>product[:price],:quantity=>product[:quantity]}
 
         else
             if self[:state]!="disable"
@@ -62,7 +62,7 @@ class Cart < ApplicationRecord
                 end
             end
 
-            selfinfo={:id=>self[:id],:amount=>self[:amount],:total_price=>self[:total_price],:state=>self[:state],:msg=>self[:msg],:name=>nil,:price=>nil,:quentity=>nil}
+            selfinfo={:id=>self[:id],:amount=>self[:amount],:total_price=>self[:total_price],:state=>self[:state],:msg=>self[:msg],:name=>nil,:price=>nil,:quantity=>nil}
         end
         
         if save

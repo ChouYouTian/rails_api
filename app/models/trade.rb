@@ -57,7 +57,7 @@ class Trade < ApplicationRecord
                         if !product
                             msg.concat "cartid:#{cart[:id]} product not exist"
                             raise
-                        elsif product[:quentity]<cart[:amount]
+                        elsif product[:quantity]<cart[:amount]
                             msg.concat "#{product[:name]} not enough"
                             raise
                         elsif cart[:state]!="active" && cart[:state]!="lack"
@@ -69,7 +69,7 @@ class Trade < ApplicationRecord
                         totalPrice+=product[:price]*cart[:amount]
 
                         cart[:state]="intrade"
-                        product[:quentity]= product[:quentity]-cart[:amount]
+                        product[:quantity]= product[:quantity]-cart[:amount]
 
                         product.save
                         trade.carts<<cart

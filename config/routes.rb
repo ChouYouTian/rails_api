@@ -28,6 +28,13 @@ Rails.application.routes.draw do
   post "trade/ship"=>"trade#ship"
   post "trade/finish"=>"trade#finish"
 
+
+  get "coupon"=>"coupon#getCoupons"
+  post "coupon/create"=>"coupon#createCoupon"
+
+  post "coupon/test"=>"coupon#test"
+
+
   post "ecpay/pay"=>"ecpay#payByECPay"
   post "ecpay/ecpayClientPage"=>"ecpay#ecpayClientPage"
   post "ecpay/ecpayReturn"=>"ecpay#ecpayReturn"

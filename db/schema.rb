@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_30_081216) do
+ActiveRecord::Schema.define(version: 2022_01_04_193523) do
 
   create_table "carts", force: :cascade do |t|
     t.integer "amount", default: 1, null: false
@@ -28,16 +28,17 @@ ActiveRecord::Schema.define(version: 2021_12_30_081216) do
   create_table "coupons", force: :cascade do |t|
     t.integer "user_id"
     t.string "name", limit: 10, null: false
-    t.string "user_type", default: "user", null: false
-    t.integer "amount", default: 0, null: false
+    t.string "coupon_type", default: "user", null: false
+    t.integer "quantity", default: 0, null: false
     t.string "discount_type", default: "price", null: false
     t.integer "discount_amount", default: 0, null: false
     t.integer "discount_ordinal", default: 0, null: false
-    t.date "start", null: false
-    t.date "end", null: false
-    t.string "state", default: "disable", null: false
+    t.datetime "start_time", null: false
+    t.datetime "end_time", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "active", default: true, null: false
+    t.string "description", null: false
     t.index ["name"], name: "index_coupons_on_name"
     t.index ["user_id"], name: "index_coupons_on_user_id"
   end
@@ -53,7 +54,7 @@ ActiveRecord::Schema.define(version: 2021_12_30_081216) do
   create_table "products", force: :cascade do |t|
     t.string "name", null: false
     t.integer "price", default: 0, null: false
-    t.integer "quentity", default: 0, null: false
+    t.integer "quantity", default: 0, null: false
     t.integer "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
